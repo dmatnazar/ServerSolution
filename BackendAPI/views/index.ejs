@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+       Server Solution
+    </title>
+
+    <style>
+        .main_div {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 50px;
+        }
+
+        .link {
+            font-size: 22px;
+            color: rgb(19, 223, 0);
+            font-style: italic;
+            font-weight: 100;
+        }
+
+        .link:hover {
+            text-decoration: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="main_div">
+        <% if(data) { %>
+            <% for(let i=0; i < data.length; i++) { %>
+                   
+                <% switch(type) {
+                    case 'version' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'get_index' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+                    
+
+                    case 'get_dashboard' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'get_existence_check' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'get_report' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'get_materials' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'get_generals' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'get_warehouses' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'post_index' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'post_procedure' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+
+                    case 'post_transaction' : %>
+                    <a class="link" href="<%= url %>/<%= data[i] %>">
+                        <%= data[i] %>
+                    </a>
+                    <% break;
+                    }
+                    %>
+            <% } %>
+        <% } %>
+    </div>
+</body>
+
+</html>

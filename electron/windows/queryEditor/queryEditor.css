@@ -1,0 +1,78 @@
+/* body {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    font-family: "Segoe UI", sans-serif;
+    padding: 10px;
+}
+
+#file-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.CodeMirror {
+    font-size: 14px;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #007acc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #005fa3;
+} */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    font-family: "Segoe UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#file-title {
+    padding: 10px;
+    font-size: 18px;
+    background-color: #252526;
+    border-bottom: 1px solid #444;
+}
+
+#editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.CodeMirror {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    font-size: 14px;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+
+#save-btn {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background-color: #007acc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    align-self: flex-start;
+}

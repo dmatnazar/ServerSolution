@@ -1,0 +1,76 @@
+@import url('../assets/fonts/noto_font.css');
+@import url('../assets/fonts/font-awesome.min.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 12px;
+}
+
+
+input, select, textarea {
+    outline: none;
+    border: .6px solid gray;
+    background-color: rgba(40, 40, 40, .7);
+    padding: 1px 3px;
+    color: rgba(255, 255, 255, 0.842);
+    height: 25px;
+    width: 100%;
+}
+
+input:focus, select:focus, textarea {
+    border: .7px solid #357ec7 ;
+}
+
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+
+input:disabled, input:read-only, textarea:disabled, textarea:read-only {
+    background-color: rgb(60, 60, 60);
+}
+
+
+button {
+    border: .7px solid gray;
+    padding: 1px 10px;
+    background-color: rgba(60, 60, 60, 0.685);
+    color: whitesmoke;
+    
+}
+
+button:hover {
+    background-color: rgba(80, 80, 80, 0.795);
+}
+
+button:active {
+    background-color: rgba(70, 70, 70, 0.795);
+    border: .6px solid #357EC7;
+    outline: 3px solid #357EC7;
+}
+
+button:disabled {
+    opacity: .5;
+}
+
+hr {
+    border-top: 0.3px solid gray;
+    border-bottom: none;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.err_msg {
+    color: #f06a6c;
+    font-style: italic;
+}
+
+a {
+    color: #b3cce4;
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' ; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; frame-src *;">
+    <title>Connection settings</title>
+    <link rel="stylesheet" href="connection.css">
+</head>
+
+<body>
+    <main class="main_block">
+        <div class="main_div_block">
+            <div>
+                <div class="backend_settings">
+                    <div>
+                        <label for="backend_addres">Backend address</label>
+                        <div>
+                            <input type="text" id="backend_address" name="backend_addres">
+                            <button class="refresh_btn" id="backend_refresh_btn">
+                                <div id="refresh_icon_wrapper">
+                                    <img id="backend_refresh_icon" src="../../assets/icons/refresh_icon.png"
+                                        alt="refresh_icon" width="16" height="16">
+                                </div>
+                                <img id="backend_checked_icon" src="../../assets/icons/checked_icon.png"
+                                    alt="checked_icon" width="16" height="16">
+                                <img id="backend_error_icon" src="../../assets/icons/exit_icon.png" alt="error_icon"
+                                    width="16" height="16">
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="backend_port">Backend port</label>
+                        <input type="number" id="backend_port" name="backend_port" style="width: 15%">
+                    </div>
+                    <div>
+                        <label for="backend_version">Backend version</label>
+                        <input type="text" id="backend_version" name="backend_version" style="width: 15%;">
+                    </div>
+                    <p id="backend_settings_err_msg" class="err_msg"></p>
+                </div>
+                <hr>
+                <div class="db_settings">
+                    <div>
+                        <label for="db_host">Host</label>
+                        <div>
+                            <input type="text" id="db_host" name="db_host">
+                            <button class="refresh_btn" id="db_refresh_btn">
+                                <div id="refresh_icon_wrapper">
+                                    <img id="db_refresh_icon" src="../../assets/icons/refresh_icon.png"
+                                        alt="refresh_icon" width="16" height="16">
+                                </div>
+                                <img id="db_checked_icon" src="../../assets/icons/checked_icon.png" alt="checked_icon"
+                                    width="16" height="16">
+                                <img id="db_error_icon" src="../../assets/icons/exit_icon.png" alt="error_icon"
+                                    width="16" height="16">
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="db_port">Database port</label>
+                        <input type="number" id="db_port" name="db_port" style="width: 15%;">
+                    </div>
+                    <div>
+                        <label for="db_name">Database name</label>
+                        <input type="text" id="db_name" name="db_name" style="width: 60%;">
+                    </div>
+                    <div>
+                        <label for="db_username">Username</label>
+                        <input type="text" id="db_username" name="db_username" style="width: 60%;">
+                    </div>
+                    <div>
+                        <label for="db_password">Password</label>
+                        <input type="password" id="db_password" name="db_password" style="width: 60%;">
+                    </div>
+                    <div class="test_conn_wrapper">
+                        <div id="db_settings_err_msg" class="err_msg"> </div>
+                        <button id="db_test_conn">
+                            <span id="db_test_conn_text">Test connection</span>
+                            <img id="db_test_conn_icon" src="../../assets/icons/process_icon.png" alt="Processing..."
+                                width="16" height="16">
+                            <img id="db_test_conn_err_icon" src="../../assets/icons/exit_icon.png" alt="error_icon"
+                                width="16" height="16">
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                <div class="query_editor">
+                    <h1>Query'es</h1>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <div></div>
+            <div>
+                <button id="cancel_btn">Cancel</button>
+                <button id="save_btn">Save</button>
+            </div>
+        </footer>
+    </main>
+
+    <script src="connectionRenderer.js" defer></script>
+</body>
+
+</html>

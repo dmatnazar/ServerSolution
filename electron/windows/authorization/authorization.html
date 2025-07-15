@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy"
+    content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' ; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; frame-src *;">
+    <title></title>
+    <link rel="stylesheet" href="authorization.css">
+</head>
+
+<body>
+    <div class="main-block">
+        <center style="margin-bottom: 20px;">
+            <h1>
+                Enter admin password
+            </h1>
+        </center>
+        <form class="authorization-section" id="formSubmit">
+            <div>
+                <label for="password">Password:</label>
+                <div>
+                    <input type="password" id="password">
+                </div>
+            </div>
+            <div>
+               <div>
+                    Show/hide password
+                    <input type="checkbox" id="showHidePassword">
+               </div>
+            </div>
+            <div>
+                <p id="error_msg"></p>
+                <p id="success_msg"></p>
+                <button type="submit" id="login_btn">Login</button>
+            </div>
+        </form>
+    </div>
+    <script src="./authorizationRenderer.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,218 @@
+@import url('../../global/global.css');
+
+
+.main_block {
+    background-color: rgba(49, 49, 49, 0.925);
+    color: whitesmoke;
+    width: 100%;
+    height: 100vh;
+    padding: 10px;
+}
+
+.main_div_block {
+    background-color: rgb(49, 49, 49);
+    width: 100%;
+    height: calc(100vh - 60px);
+    padding: 15px;
+    display: flex;
+    gap: 25px;
+    overflow-y: auto;
+}
+
+.main_div_block > div {
+    width: 100%;
+}
+
+.backend_settings,
+.db_settings,
+.ecom_db_settings,
+.ecom_remote_db_settings,
+.socket_settings,
+.query_editor
+.site_backend_settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.backend_settings>div,
+.db_settings>div,
+.ecom_db_settings>div,
+.ecom_remote_db_settings>div,
+.socket_settings>div,
+.site_backend_settings >div {
+    display: flex;
+    align-items: center;
+}
+
+.backend_settings>div label,
+.db_settings>div label,
+.ecom_db_settings > div label,
+.ecom_remote_db_settings > div label,
+.socket_settings>div label,
+.site_backend_settings > div label {
+    width: 40%;
+}
+
+.backend_settings>div input .db_settings>div input,
+ .ecom_db_settings>div input, .ecom_remote_db_settings>div input,
+.socket_settings>div input, .site_backend_settings> div input {
+    width: 60%;
+    margin-right: auto;
+}
+
+
+.backend_settings>div div,
+.db_settings>div div,
+.ecom_db_settings > div div,
+.ecom_remote_db_settings > div div,
+.socket_settings>div div,
+.site_backend_settings>div div {
+    width: 60%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.test_conn_wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.refresh_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    user-select: none;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    outline: 3px;
+}
+
+.refresh_btn:hover {
+    border: none;
+    outline: none;
+}
+
+.refresh_btn:active {
+    border: none;
+    outline: none;
+}
+
+#refresh_icon_wrapper, #ecom_refresh_icon_wrapper, #ecom_remote_refresh_icon_wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#refresh_icon_wrapper:active, #ecom_refresh_icon_wrapper:active, #ecom_remote_refresh_icon_wrapper:active {
+    animation: spin .5s linear infinite;
+}
+
+
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+footer {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+#backend_checked_icon, #db_checked_icon,  #ecom_db_checked_icon, #ecom_remote_db_checked_icon, #socket_checked_icon, #db_error_icon, #backend_error_icon, #ecom_db_error_icon, #ecom_remote_db_error_icon, #socket_error_icon, #db_test_conn_err_icon, #ecom_db_test_conn_err_icon, #ecom_remote_db_test_conn_err_icon, #socket_test_conn_err_icon, #site_backend_test_conn_err_icon, #site_backend_checked_icon, #site_backend_error_icon {
+    display: none;
+}
+
+#db_test_conn, #ecom_db_test_conn, #ecom_remote_db_test_conn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#db_test_conn_icon, #ecom_db_test_conn_icon, #ecom_remote_db_test_conn_icon, #socket_test_conn_icon, #site_backend_test_conn_icon {
+    animation: spin .5s linear infinite;
+    display: none;
+}
+
+
+/* Toggle switch  styles here... */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+/* Toggle switch styles END here. */

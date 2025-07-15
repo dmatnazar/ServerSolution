@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' ; img-src * data: 'unsafe-inline'; connect-src * 'unsafe-inline'; frame-src *;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./about.css">
+</head>
+
+<body>
+
+
+    <main class="main_block">
+        <div class="main_div_block">
+            <section class="first_section" style="border-left: none;">
+                <div>
+                    <p>Backend info</p>
+                    <div>
+                        <label for="server_url">Server URL</label>
+                        <i id="server_url"
+                            style="text-decoration: underline; font-style: italic; color: #b3cce4; cursor: pointer; user-select: none;">- - - - - - - - -</i>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <div>
+                    <p>Database info</p>
+                    <div>
+                        <label for="db_host">Database host</label>
+                        <i id="db_host">- - - - - -</i>
+                    </div>
+                    <div>
+                        <label for="db_port">Database port</label>
+                        <i id="db_port"> - - - - </i>
+                    </div>
+                    <div>
+                        <label for="db_name">Database name</label>
+                        <i id="db_name">- - - - - - - -</i>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+
+        <footer>
+            <div>
+                <span id="app_version"></span>
+                <span id="net_connection"></span>
+            </div>
+            <div>
+                <button id="close_btn">Close</button>
+            </div>
+        </footer>
+    </main>
+
+
+    <script src="./aboutRenderer.js"></script>
+</body>
+
+</html>
