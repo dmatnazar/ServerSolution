@@ -1,9 +1,9 @@
-const { ExecQueryGetRows, ResSend, CheckObjForEmpty, CheckObjOrArrForNull } =  require('../../../Common/functions.js');
-const {LoadQuery} = require('..//..//..//Common/functions.js')
+const { ExecQueryGetRows, LoadQuery, ResSend, CheckObjForEmpty, CheckObjOrArrForNull } =  require('../../../Common/functions.js');
 const { GetConnPool } =  require('../../../Common/mssql.js');
 const { httpSts } =  require('../../../Common/static.js');
 const fs = require('fs').promises; // Asinhron faýl okamak üçin
 const path = require('path');
+const { rows } = require('mssql');
 
 const GetContactsQuery = LoadQuery ('GetContactsQuery' , 'Generals')
 const GetFirmDataQueryDefault = LoadQuery ('GetFirmDataQueryDefault' , 'Generals')
@@ -23,27 +23,36 @@ const GetStatusesQuery = LoadQuery ('GetStatusesQuery' , 'Generals')
 
 
 const GetOptions = async (req, res) => {
+    const query = await LoadQuery('GetOptionsQuery', 'Generals');
     try {
-        let rows = await ExecQueryGetRows(GetOptionsQuery);
+        let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
     } catch (err) {
         ResSend(res, httpSts.ServerError, null, `${err}`);
     }
 }
 
-
 const GetFirmData = async (req, res) => {
     try {
         let params = req.query['is_hosting'];
-        let query = CheckObjForEmpty(params) ? GetFirmDataQueryHosting : GetFirmDataQueryDefault;
+
+        // SQL soragy is hosting-e görä ýükleýäris
+        let query = CheckObjForEmpty(params)
+            ? await LoadQuery('GetFirmDataQueryHosting', 'Generals')
+            : await LoadQuery('GetFirmDataQueryDefault', 'Generals');
+
+        if (!query) {
+            return ResSend(res, httpSts.ServerError, 'Query not found', null);
+        }
 
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
     } catch (err) {
         ResSend(res, httpSts.ServerError, null, `${err}`);
+        console.error("Firm query error:", err);
     }
-}
+};
 
 const GetFirmLogo = async(req, res) =>
 {
@@ -74,7 +83,7 @@ const GetPartners = async (req, res) => {
     let params = req.query['is_hosting'];
     // Asynchrondyr diýip hasaplaýarys
     const query = CheckObjForEmpty(params)
-      ? await LoadQuery('GetPartnersQueryHosting', 'Generals') // subfolder dogry bolsa
+      ? await LoadQuery('GetPartnersQueryHosting', 'Generals')
       : await LoadQuery('GetPartnersQueryDefault', 'Generals');
 
     if (!query) {
@@ -129,8 +138,9 @@ const GetRoutePlans = async (req, res) => {
 };
 
 const GetUsingTargetPlans = async (req, res) => {
+    const query = await LoadQuery('GetUsingTargetPlansQuery', 'Generals');
     try {
-        let rows = await ExecQueryGetRows(GetUsingTargetPlansQuery);
+        let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
     } catch (err) {
         ResSend(res, httpSts.ServerError, null, `${err}`);
@@ -138,10 +148,12 @@ const GetUsingTargetPlans = async (req, res) => {
 };
 
 const GetRestrictionSettings = async(req, res) =>
-{
+{   
+    const query = await LoadQuery('GetRestrictionSettingsQuery', 'Generals');
+
     try
     {
-        let rows = await ExecQueryGetRows(GetRestrictionSettingsQuery);
+        let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
     } catch (err) {
@@ -166,9 +178,10 @@ const GetContacts = async (req, res) => {
 
 const GetStatuses = async (req, res) =>
 {
+    const query = await LoadQuery('GetStatusesQuery', 'Generals');
     try
     {
-        let rows = await ExecQueryGetRows(GetStatusesQuery);
+        let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
     } catch (err) {
@@ -177,11 +190,13 @@ const GetStatuses = async (req, res) =>
 }
 
 const GetCheckSums = async (req, res) => {
+    const query = await LoadQuery('GetCheckSumsQuery', 'Generals');
+    // console.log("GetCheckSums query:", query);
     try {
-        let rows = await ExecQueryGetRows(GetCheckSumsQuery);
+        let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
     } catch (err) {
-        ResSend(res, httpSts.ServerError, null, `${err}`);
+        ResSend(res, httpSts.ServerError, null, `${err}` + `\nQuery: ${query}`);
     }
 };
 
