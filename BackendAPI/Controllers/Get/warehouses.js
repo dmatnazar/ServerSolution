@@ -4,7 +4,7 @@ const { ExecQueryGetRows, ExecQueryGetValue, ResSend, CheckObjForEmpty,
 const { httpSts } =  require('../../../Common/static.js');
 
 const { GetWarehousesQuery, GetWarehousesHostingQuery } = require('../../../Queries/Werehouses/GetWarehousesQuery.js');
-const { GetExecuteSP, GetMainQuery, GetCalcOrdAmountQuery } = require('../../../Queries/Werehouses/GetStockByWhouseQuery.js');
+//const { GetExecuteSP, GetMainQuery, GetCalcOrdAmountQuery } = require('../../../Queries/Werehouses/GetStockByWhouseQuery.js');
 //const { GetPersonalStockQuery } = require('../../../Queries/Werehouses/GetPersonalStockQuery.js');
 
 const GetWarehouses = async (req, res) => {
@@ -27,10 +27,11 @@ const GetStockByWhouse = async (req, res) => {
     let props = ['seller_id', 'whouse_id'];
 
     try {
+        const GetExecuteSP = () => `exec sp_mg_recalc_mat_totals;\n`;
         const execute_sp = GetExecuteSP();
-        const main_query = GetMainQuery();
-        const calc_ord_amount = GetCalcOrdAmountQuery();
-
+        const main_query = await LoadQuery('GetMainQuery' , 'Werehouses')
+        const calc_ord_amount = await LoadQuery('GetCalcOrdAmountQuery' , 'Werehouses')
+        // console.log('Main query' , main_query)
         const queryMainWh = `select isnull(info_value, 0) as main_whouse_id
                              from tbl_br_general_info
                              where info_name = 'MAIN_WAREHOUSE_ID'`;
@@ -43,6 +44,7 @@ const GetStockByWhouse = async (req, res) => {
             str_format(calc_ord_amount, '6', ''),
             main_whouse_id
         );
+        console.log('str Uion ------------' , strUnion)
 
         let query = execute_sp + strUnion;
         let main_wh_stock = await ExecQueryGetRows(query);
