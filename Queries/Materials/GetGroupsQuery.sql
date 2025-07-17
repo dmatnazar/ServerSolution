@@ -1,3 +1,4 @@
+--save
 SELECT DISTINCT
 	lower( g.group_code_id_guid ) AS group_guid,
 	m.group_code AS group_name 

@@ -1,11 +1,11 @@
 const str_format = require( '@stdlib/string-format' );
-
 const { ExecQueryGetRows, ExecQueryGetValue, ResSend, CheckObjForEmpty,
-        CheckObjProps } =  require('../../../Common/functions.js');
+        CheckObjProps, LoadQuery} =  require('../../../Common/functions.js');
 const { httpSts } =  require('../../../Common/static.js');
+
 const { GetWarehousesQuery, GetWarehousesHostingQuery } = require('../../../Queries/Werehouses/GetWarehousesQuery.js');
 const { GetExecuteSP, GetMainQuery, GetCalcOrdAmountQuery } = require('../../../Queries/Werehouses/GetStockByWhouseQuery.js');
-const { GetPersonalStockQuery } = require('../../../Queries/Werehouses/GetPersonalStockQuery.js');
+//const { GetPersonalStockQuery } = require('../../../Queries/Werehouses/GetPersonalStockQuery.js');
 
 const GetWarehouses = async (req, res) => {
     try {
@@ -71,21 +71,20 @@ const GetStockByWhouse = async (req, res) => {
     }
 };
 
-const GetPersonalStock = async(req, res) =>
-{
-    try
-    {
+const GetPersonalStock = async (req, res) => {
+    try {
         let whouse_id = req.query['whouse_id'];
-
-        if(CheckObjForEmpty(whouse_id))
-        {
-
-            let rows = await ExecQueryGetRows(GetPersonalStockQuery(whouse_id));
+        console.log('whouse_id:', whouse_id);
+        if (CheckObjForEmpty(whouse_id)) {
+            const query = await LoadQuery('GetPersonalStockQuery', 'Werehouses', [whouse_id], );
+            console.log('SQL Query:', query);
+            const rows = await ExecQueryGetRows(query);
+            console.log('ROWS:', rows);
             ResSend(res, httpSts.Success, null, rows);
+        } else {
+            ResSend(res, httpSts.ServerError, 'Get request \'whouse_id\' params is empty! ');
         }
-        else
-            ResSend(res, httpSts.ServerError, 'Get request \'whouse_id\' params is empty!');
-        
+
     } catch (err) {
         ResSend(res, httpSts.ServerError, null, `${err}`);
     }
