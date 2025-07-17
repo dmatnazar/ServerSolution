@@ -312,15 +312,29 @@ const LoadQuery = async (fileName, subFolder, params = []) => {
 const processQuery = (query, params) => {
     let resultQuery = query;
     params.forEach((param, index) => {
+        // Parametriň tipini barlaýas
         const replacement = param === undefined || param === null 
             ? 'NULL'
             : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
             ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
-            : `'${param}'`;
-        resultQuery = resultQuery.replace(`{${index}}`, replacement);
+            : typeof param === 'string' ? `'${param}'` : param; // San bolsa, dykyzsyz goşmaly
+        resultQuery = resultQuery.replace(new RegExp(`\\{${index}\\}`, 'g'), replacement);
     });
     return resultQuery;
 };
+
+// const processQuery = (query, params) => {
+//     let resultQuery = query;
+//     params.forEach((param, index) => {
+//         const replacement = param === undefined || param === null 
+//             ? 'NULL'
+//             : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
+//             ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
+//             : `'${param}'`;
+//         resultQuery = resultQuery.replace(`{${index}}`, replacement);
+//     });
+//     return resultQuery;
+// };
 module.exports = {
   ExecQueryGetRows,
   ExecQueryGetValue,

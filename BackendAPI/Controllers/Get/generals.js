@@ -5,20 +5,9 @@ const fs = require('fs').promises; // Asinhron faýl okamak üçin
 const path = require('path');
 const { rows } = require('mssql');
 
-const GetContactsQuery = LoadQuery ('GetContactsQuery' , 'Generals')
-const GetFirmDataQueryDefault = LoadQuery ('GetFirmDataQueryDefault' , 'Generals')
-const GetFirmDataQueryHosting = LoadQuery ('GetFirmDataQueryHosting' , 'Generals')
-const GetCheckSumsQuery = LoadQuery('GetCheckSumsQuery', 'Generals');
-const GetOptionsQuery = LoadQuery('GetOptionsQuery', 'Generals');
-const GetPartnersQueryDefault = LoadQuery('GetPartnersQueryDefault', 'Generals');
-const GetPartnersQueryHosting = LoadQuery('GetPartnersQueryHosting', 'Generals');
-const GetRestrictionSettingsQuery = LoadQuery('GetRestrictionSettingsQuery', 'Generals');
 const GetRoutePlansMainQuery = LoadQuery('GetRoutePlansMainQuery', 'Generals');
 const GetRouteDetailsQuery = LoadQuery('GetRouteDetailsQuery', 'Generals');
 const GetRoutePartnersQuery = LoadQuery('GetRoutePartnersQuery', 'Generals');
-const GetSalesmansQuery = LoadQuery('GetSalesmansQuery', 'Generals');
-const GetUsingTargetPlansQuery = LoadQuery('GetUsingTargetPlansQuery', 'Generals');
-const GetStatusesQuery = LoadQuery ('GetStatusesQuery' , 'Generals')
 
 
 
@@ -161,14 +150,36 @@ const GetRestrictionSettings = async(req, res) =>
     }
 }
 
+// const GetContacts = async (req, res) => {
+//     if (CheckObjOrArrForNull(req.query)) {
+//         try {
+
+//             const { operand, guid } = req.query;
+//             const query = await LoadQuery('GetContactsQuery', 'Generals' , [operand], [guid]);
+//             const rows = await ExecQueryGetRows(query);
+//             console.log("GetContacts rows:", rows);
+//             ResSend(res, httpSts.Success, null, rows);
+//         } catch (err) {
+//             ResSend(res, httpSts.ServerError, null, `${err}`);
+//         }
+//     } else {
+//         ResSend(res, httpSts.BadRequest, `Request body is empty! params[operand, guid]`, null);
+//     }
+// };
+
 const GetContacts = async (req, res) => {
     if (CheckObjOrArrForNull(req.query)) {
         try {
             const { operand, guid } = req.query;
-            let query = GetContactsQuery(operand, guid);
-            let rows = await ExecQueryGetRows(query);
+            // operand we guid-i bir params massiwine birleşdirýäs
+            const params = [operand, guid];
+            const query = await LoadQuery('GetContactsQuery', 'Generals', params);
+            console.log('SQL Query after replacement:', query); // Çalşylandan soňky soragy barlamak
+            const rows = await ExecQueryGetRows(query);
+            console.log("GetContacts rows:", rows);
             ResSend(res, httpSts.Success, null, rows);
         } catch (err) {
+            console.error('Ýalňyşlyk:', err);
             ResSend(res, httpSts.ServerError, null, `${err}`);
         }
     } else {

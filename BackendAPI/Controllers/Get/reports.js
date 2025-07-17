@@ -15,10 +15,8 @@ const GetSalesByMaterials = async (req, res) => {
 
             const seller_id = data_obj['seller_id'];
             if (CheckObjForEmpty(seller_id) && parseInt(seller_id) > 0)
-                cond += ` AND i.salesman_id = '${seller_id}'`;
-
-            // ✅ Query okujak
-            const queryText = await ReadQuery('GetSalesByMaterialsQuery', 'Reports', [cond]);
+                selasman_id += ` AND i.salesman_id = '${seller_id}'`;
+            const queryText = await ReadQuery('GetSalesByMaterialsQuery', 'Reports', [selasman_id]);
             const rows = await ExecQueryGetRows(queryText);
 
             ResSend(res, httpSts.Success, null, rows);

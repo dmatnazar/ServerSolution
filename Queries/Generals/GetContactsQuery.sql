@@ -1,4 +1,3 @@
---save
 SELECT * FROM (
     SELECT 
         LOWER(firm_id_guid) AS parent_guid, 
@@ -20,11 +19,9 @@ SELECT * FROM (
         FROM tbl_mg_firm
     ) sbq 
     UNPIVOT (
-        contact_value FOR attributes IN (tel_number, address1, address2)
+       (contact_value FOR attributes IN (tel_number, address1, address2)
     ) unpvt
-
     UNION ALL
-
     SELECT 
         LOWER(partner_guid) AS parent_guid, 
         contact_value, 
@@ -52,4 +49,4 @@ SELECT * FROM (
         )
     ) unpvt
 ) sbq 
-WHERE LEN(contact_value) > 2 AND parent_guid ${0} {1}
+WHERE LEN(contact_value) > 2 AND parent_guid {0} {1}
