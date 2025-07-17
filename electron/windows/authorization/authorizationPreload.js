@@ -7,7 +7,10 @@ ipcRenderer.on('window_name_channel', (event, arg) => {
 })
 
 
-
+function checkPass(pass) {
+    let pass = env.admin_pass
+    if 
+}
 
 
 
