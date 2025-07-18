@@ -288,7 +288,7 @@ function CalculateNewSize(width, height, targetSize) {
 
 
 // For save query
-const queryCache = {};
+const queryCache = {};``
 const LoadQuery = async (fileName, subFolder, params = []) => {
     const cacheKey = `${subFolder}/${fileName}`;
     if (queryCache[cacheKey]) {
