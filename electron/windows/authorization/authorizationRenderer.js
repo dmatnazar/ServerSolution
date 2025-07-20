@@ -25,12 +25,22 @@ if (showHidePassword) {
 
 if(login_btn){
     login_btn.addEventListener('click', () => {
-        let windowName = window.authWindow.getWindowName()
+        // Make sure authWindow is available
+        if (!window.authWindow) {
+            console.error('authWindow is not initialized');
+            error_msg.innerText = 'System error: Authentication not initialized';
+            return;
+        }
+
+        let windowName = window.authWindow.getWindowName();
+        console.log('windowName: ', windowName);
+        
         if(!password.value){
             error_msg.innerText = 'Inputs cannot be empty';
-        } else if(password.value !== window.authWindow.getAdminPass()){
+        } 
+        else if(password.value !== window.authWindow.getAdminPass()){
             error_msg.innerText = 'Nädogry parol';
-        } else {z
+        } else {
             error_msg.style.display = 'none';
             success_msg.innerText = 'Successfully';
             // window.authWindow.authSuccessfully()
@@ -39,7 +49,6 @@ if(login_btn){
             }  else if (windowName === 'createConnectionWindow'){
                 window.authWindow.openConnectionWindow()
             }
-           
         }
     })
 }

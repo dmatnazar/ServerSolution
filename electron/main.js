@@ -153,8 +153,12 @@ function createAuthorizationWindow(windowName, title) {
     authorizationWin.setMenuBarVisibility(false)
 
     // authorizationWin.webContents.openDevTools()
-    authorizationWin.webContents.send('window_name_channel', `${windowName}`)
     authorizationWin.loadFile(authIndex)
+    
+    authorizationWin.webContents.on('did-finish-load', () => {
+        authorizationWin.webContents.send('window_name_channel', windowName)
+    })
+    
     return authorizationWin
 }
 

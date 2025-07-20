@@ -1,18 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron')
-const {  prcEnv: env } = require('../../../Common/static')
+const { prcEnv: env } = require('../../../Common/static')
 
 let receivedData = 'initial';
 ipcRenderer.on('window_name_channel', (event, arg) => {
     receivedData = arg
 })
-
-
-function checkPass(pass) {
-    let pass = env.admin_pass
-    if 
-}
-
-
 
 contextBridge.exposeInMainWorld('authWindow', {
     getAdminPass: () => env.admin_pass,
@@ -20,8 +12,7 @@ contextBridge.exposeInMainWorld('authWindow', {
     getWindowName: () => getData(),
     openAboutWindow: () => ipcRenderer.send('open_about_window'),
     openRegisterWindow: () => ipcRenderer.send('open_register_window'),
-    openConnectionWindow: () => ipcRenderer.send('open_connection_window'),
-
+    openConnectionWindow: () => ipcRenderer.send('open_connection_window')
 })
 
 function getData() {

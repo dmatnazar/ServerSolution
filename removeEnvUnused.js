@@ -6,6 +6,7 @@ const log = require('electron-log')
 
 
 const envPath = path.join(process.cwd(), '.env')
+console.log('envPath-----' , envPath)
 
 
 const envCopy = env

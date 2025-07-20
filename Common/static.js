@@ -3,6 +3,7 @@ const dotenvExpand = require('dotenv-expand')
 
 const myEnv = dotenv.config();
 dotenvExpand.expand(myEnv)
+console.log('Environment variables loaded:', myEnv);
 
 const prcEnv = {
   backend_address: process.env.backend_address,
