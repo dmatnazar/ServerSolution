@@ -3,23 +3,6 @@ const { ExecQueryGetRows, ResSend, LoadQuery, CheckObjForEmpty } =  require('../
 const { GetConnPool } =  require('../../../Common/mssql.js');
 const { httpSts } =  require('../../../Common/static.js');
 
-const GetAllMaterialsQuery = LoadQuery('GetAllMaterialsQuery', 'Materials');
-const GetAllMaterialsHostingQuery = LoadQuery('GetAllMaterialsHostingQuery', 'Materials');
-const GetMaterialPricesQuery = LoadQuery('GetMaterialPricesQuery', 'Materials');
-const GetAttributesQuery = LoadQuery('GetAttributesQuery', 'Materials');
-const GetBarcodesQuery = LoadQuery('GetBarcodesQuery', 'Materials');
-const GetCurrencyQuery = LoadQuery('GetCurrencyQuery', 'Materials');
-const GetPrTypesQuery = LoadQuery('GetPrTypesQuery', 'Materials');
-const GetGroupsQuery = LoadQuery('GetGroupsQuery', 'Materials');
-const GetLastPricesQuery = LoadQuery('GetLastPricesQuery', 'Materials');
-const GetMaterialImageQuery = LoadQuery('GetMaterialImageQuery', 'Materials');
-const GetMaterialsImgIDQuery = LoadQuery('GetMaterialsImgIDQuery', 'Materials');
-const GetMtrlAttrUnitQuery = LoadQuery('GetMtrlAttrUnitQuery', 'Materials');
-const UnitsList = LoadQuery('UnitsList', 'Materials');
-const UnitDetailsBasic = LoadQuery('UnitDetailsBasic', 'Materials');
-const UnitDetailsWithQuery = LoadQuery('UnitDetailsWithQuery', 'Materials');
-const UnitsWithGuid = LoadQuery('UnitsWithGuid', 'Materials');
-
 const GetAllMaterials = async (req, res) => {
     try {
         let isHosting = req.query['is_hosting'];
@@ -86,6 +69,7 @@ const GetMaterialsImgID = async(req, res) =>
     try
     {
         const query = await LoadQuery('GetMaterialsImgIDQuery', 'Materials');
+        console.log('Material_id -----------' , query)
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -98,10 +82,10 @@ const GetMaterialsImgID = async(req, res) =>
 const GetMaterialImage = async (req, res) => {
     try {
         let image_id = req.query['image_id'];
-
+        console.log('image_id-------', image_id)
         if (CheckObjForEmpty(image_id)) {
             const query = await LoadQuery('GetMaterialImageQuery', 'Materials', [image_id]);
-
+            console.log('query------------' , query)
             const sqlConnPool = await GetConnPool();
             let result = await sqlConnPool.request().query(query);
 

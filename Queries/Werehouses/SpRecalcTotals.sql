@@ -1,0 +1,1 @@
+exec sp_mg_recalc_mat_totals;

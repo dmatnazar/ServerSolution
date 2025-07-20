@@ -1,33 +1,47 @@
 const {
     ExecQueryGetRows, ResSend, CheckObjProps,
-    CheckObjForEmpty, ConvertToSQLFormat, ReadQuery
+    CheckObjForEmpty, ConvertToSQLFormat, LoadQuery
 } = require('../../../Common/functions.js');
 const { httpSts } = require('../../../Common/static.js');
 
 const GetSalesByMaterials = async (req, res) => {
     const data_obj = req.query;
     const props = ['dt_begin', 'dt_end', 'seller_id'];
+    // console.log('data_obj ------', data_obj);
 
     if (CheckObjProps(data_obj, props)) {
         try {
-            let cond = `i.inv_date BETWEEN ${ConvertToSQLFormat(data_obj['dt_begin'])} 
-                                          AND ${ConvertToSQLFormat(data_obj['dt_end'])}`;
+            const startDate = ConvertToSQLFormat(data_obj['dt_begin']);
+            const endDate = ConvertToSQLFormat(data_obj['dt_end']);
+            const seller_id = parseInt(data_obj['seller_id']);
+            console.log('startDate' , startDate , 'endDate', endDate , 'seller_id---' , seller_id)
 
-            const seller_id = data_obj['seller_id'];
-            if (CheckObjForEmpty(seller_id) && parseInt(seller_id) > 0)
-                selasman_id += ` AND i.salesman_id = '${seller_id}'`;
-            const queryText = await ReadQuery('GetSalesByMaterialsQuery', 'Reports', [selasman_id]);
-            const rows = await ExecQueryGetRows(queryText);
+            // if (CheckObjForEmpty(seller_id) || seller_id > 0) {
+            //     return ResSend(res, httpSts.BadRequest, 'Invalid seller_id!', null);
+            // }
 
+            const query = await LoadQuery('GetSalesByMaterialsQuery', 'Reports', 
+                [startDate, endDate, seller_id]);
+            // const query = await ExecQueryGetRows(await LoadQuery("get_sales_by_materials", "Reports", [
+            //     ConvertToSQLFormat(data_obj["dt_begin"]),
+            //     ConvertToSQLFormat(data_obj["dt_end"]),
+            //     `${data_obj["seller_id"]}`
+            console.log('query------' , query)
+
+
+            const rows = await ExecQueryGetRows(query);
             ResSend(res, httpSts.Success, null, rows);
+
         } catch (err) {
-            console.error('GetSalesByMaterials ERROR:', err);
             ResSend(res, httpSts.ServerError, null, `${err}`);
         }
     } else {
         ResSend(res, httpSts.BadRequest, 'Get request params is empty!', null);
     }
 };
+
+
+
 
 module.exports = {
     GetSalesByMaterials

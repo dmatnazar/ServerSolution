@@ -1,6 +1,6 @@
 const str_format = require( '@stdlib/string-format' );
 const { ExecQueryGetRows, ExecQueryGetValue, ResSend, CheckObjForEmpty,
-        CheckObjProps, LoadQuery} =  require('../../../Common/functions.js');
+        CheckObjProps, LoadQuery, ExecStoredProcedure} =  require('../../../Common/functions.js');
 const { httpSts } =  require('../../../Common/static.js');
 
 
@@ -19,41 +19,43 @@ const GetWarehouses = async (req, res) => {
         ResSend(res, httpSts.ServerError, null, `${err}`);
     }
 };
+
 const GetStockByWhouse = async (req, res) => {
     const obj = req.query;
-    const props = ['seller_id', 'whouse_id'];
+    const requiredProps = ['seller_id', 'whouse_id'];
 
     try {
-        const execute_sp = 'exec sp_mg_recalc_mat_totals;';
-        await ExecQuery(execute_sp);
-        const queryMainWh = `select isnull(info_value, 0) as main_whouse_id
-                             from tbl_br_general_info
-                             where info_name = 'MAIN_WAREHOUSE_ID'`;
-        const main_whouse_id = await ExecQueryGetValue(queryMainWh, 'main_whouse_id'); 
-        const calcOrdAmount15 = `(${await LoadQuery('GetCalcOrdAmountQuery', 'Werehouses', ['1,5', ''])})`;
-        const calcOrdAmount6 = `(${await LoadQuery('GetCalcOrdAmountQuery', 'Werehouses', ['6', ''])})`;
+        // Step 1: SP-ni işlet
+        const recalcQuery = await LoadQuery('SpRecalcTotals', 'Werehouses');
+        await ExecQueryGetRows(recalcQuery); // SP köplenç RETURN bolmaz, şonuň üçin ExecQueryGetRows ok
 
-        const main_query = await LoadQuery('GetMainQuery', 'Werehouses', ['', calcOrdAmount15, calcOrdAmount6, `(${main_whouse_id})`]);
-        const main_wh_stock = await ExecQueryGetRows(main_query);
+        // Step 2: MAIN_WHOUSE_ID alyň
+        const mainWhouseIdQuery = `
+            SELECT ISNULL(info_value, 0) AS main_whouse_id 
+            FROM tbl_br_general_info 
+            WHERE info_name = 'MAIN_WAREHOUSE_ID'`;
+        const main_whouse_id = await ExecQueryGetValue(mainWhouseIdQuery, 'main_whouse_id');
 
-        let other_wh_stock = null; 
+        // Step 3: Main sklad üçin stock
+        const mainStockQuery = await LoadQuery('MainWhStock', 'Werehouses', [main_whouse_id]);
+        const main_wh_stock = await ExecQueryGetRows(mainStockQuery);
 
-        if (CheckObjProps(obj, props) && obj['whouse_id'] !== main_whouse_id) {
-            const extra = `and f.salesman_id = '${obj['seller_id']}'`;
+        let other_wh_stock = null;
 
-            const calcExtra15 = `(${await LoadQuery('GetCalcOrdAmountQuery', 'Werehouses', ['1,5', extra])})`;
-            const calcExtra6 = `(${await LoadQuery('GetCalcOrdAmountQuery', 'Werehouses', ['6', extra])})`;
-
-            const other_query = await LoadQuery('GetMainQuery', 'Werehouses', [extra, calcExtra15, calcExtra6, `(${obj['whouse_id']})`]);
-            other_wh_stock = await ExecQueryGetRows(other_query);
+        // Step 4: Eger başga sklad soralsa — goşmaça stock çek
+        if (CheckObjProps(obj, requiredProps) && obj['whouse_id'] !== main_whouse_id) {
+            const otherStockQuery = await LoadQuery('other_wh_stock', 'Warehouses', [
+                obj['seller_id'], obj['whouse_id']
+            ]);
+            other_wh_stock = await ExecQueryGetRows(otherStockQuery);
         }
 
-        const joined = other_wh_stock ? main_wh_stock.concat(other_wh_stock) : main_wh_stock;
-
-        ResSend(res, httpSts.Success, null, joined);
+        // Step 5: Birleşdir
+        const result = other_wh_stock ? main_wh_stock.concat(other_wh_stock) : main_wh_stock;
+        ResSend(res, httpSts.Success, null, result);
 
     } catch (err) {
-        ResSend(res, httpSts.ServerError, null, `${err}`);
+        ResSend(res, httpSts.ServerError, null, `GetStockByWhouse Error: ${err.message}`);
     }
 };
 

@@ -15,7 +15,7 @@ const projectRoot = path.resolve(__dirname, '..');
 async function ExecQueryGetRows(query) {
   try {
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
-      console.error('[ExecQueryGetRows] Ýalňyşlyk: Query ýok ýa-da boş!');
+      console.error('[ExecQueryGetRows] Error: Query does not exist or is empty!');
       return null;
     }
 
@@ -23,13 +23,13 @@ async function ExecQueryGetRows(query) {
     const result = await sqlConnPool.request().query(query);
 
     if (!result || !result.recordset) {
-      console.warn('[ExecQueryGetRows] Netije boş ýa-da undefined.');
+      console.warn('[ExecQueryGetRows] The result is empty or undefined.');
       return null;
     }
 
     return result.recordset;
   } catch (err) {
-    console.error('[ExecQueryGetRows] SQL ýerine ýetiriliş hatasy:', err);
+    console.error('[ExecQueryGetRows] SQL execution error:', err);
     return null;
   }
 }
@@ -108,7 +108,7 @@ function CheckObjForEmpty(object) {
 
 function ConvertToSQLFormat(get_date) {
   let date = ConvertToDate(get_date);
-  return `cast('${date.toLocaleDateString('en-CA')}' as date)`;
+  return `${date.toLocaleDateString('en-CA')}`;
 }
 
 //======================================================================9
@@ -305,7 +305,7 @@ const LoadQuery = async (fileName, subFolder, params = []) => {
         queryCache[cacheKey] = query;
         return processQuery(query, params);
     } catch (err) {
-        throw new Error(`SQL faýlyny okamakda şowsuzlyk: ${subFolder}/${fileName}.sql - ${err.message}`);
+        throw new Error(`Failed to read SQL file: ${subFolder}/${fileName}.sql - ${err.message}`);
     }
 };
 
@@ -323,18 +323,17 @@ const processQuery = (query, params) => {
     return resultQuery;
 };
 
-// const processQuery = (query, params) => {
-//     let resultQuery = query;
-//     params.forEach((param, index) => {
-//         const replacement = param === undefined || param === null 
-//             ? 'NULL'
-//             : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
-//             ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
-//             : `'${param}'`;
-//         resultQuery = resultQuery.replace(`{${index}}`, replacement);
-//     });
-//     return resultQuery;
-// };
+/**
+ * Executes a stored procedure from SQL file (without output params).
+ * @param {string} fileName 
+ * @param {string} subFolder 
+ * @returns {Promise<void>}
+ */
+const ExecStoredProcedure = async (fileName, subFolder) => {
+    const spQuery = await LoadQuery(fileName, subFolder);
+    return await ExecQueryGetRows(spQuery);
+};
+ 
 module.exports = {
   ExecQueryGetRows,
   ExecQueryGetValue,
@@ -351,5 +350,6 @@ module.exports = {
   AxiosPost, AxiosGet,
   ImageUploader,
   ImageCompress,
-  LoadQuery
+  LoadQuery,
+  ExecStoredProcedure
 };

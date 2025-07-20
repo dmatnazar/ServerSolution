@@ -4,4 +4,4 @@ SELECT
 FROM
 	tbl_mg_images 
 WHERE
-	image_id = $ { 0 }
+	image_id = {0}
