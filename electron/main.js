@@ -352,6 +352,25 @@ ipcMain.on('save_to_env', async (event, args) => {
     });
 });
 
+ipcMain.handle('read-default-query', async (event, defaultPath) => {
+  try {
+    console.log('Reading default query from:', defaultPath);
+    
+    const exists = await fs.access(defaultPath).then(() => true).catch(() => false);
+    if (!exists) {
+      console.error('Default query file does not exist:', defaultPath);
+      return null;
+    }
+    
+    const content = await fs.readFile(defaultPath, 'utf8');
+    console.log('Successfully read default query, length:', content.length);
+    return content;
+  } catch (error) {
+    console.error('Error reading default query:', error);
+    return null;
+  }
+});
+
 ipcMain.on('get-version', (event) => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'packageCopy.json'), 'utf8'));
     event.returnValue = `${packageJson.name}  v${packageJson.version}`;

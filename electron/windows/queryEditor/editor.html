@@ -11,9 +11,27 @@
 </head>
 <body>
   <h2 id="file-title"></h2>
+  
+  <!-- Täze navbar goşuldy -->
+  <div id="navbar">
+    <button id="save-btn">💾 Save</button>
+    <button id="restore-btn">🔄 Restore Default Query</button>
+  </div>
+
   <div id="editor-container">
     <textarea id="code-area"></textarea>
-    <button id="save-btn">💾 Save</button>
+  </div>
+
+  <!-- Confirmation Dialog goşuldy -->
+  <div id="confirmation-overlay">
+    <div id="confirmation-dialog">
+      <h3>⚠️ Üýtgeşmeleri pozular</h3>
+      <p>Uytgeshmeler pozular we defoult query goyular.<br>Şony etmek isleýärsiňizmi?</p>
+      <div id="confirmation-buttons">
+        <button id="confirm-yes">Yes</button>
+        <button id="confirm-no">No</button>
+      </div>
+    </div>
   </div>
 
   <!-- CodeMirror Scripts -->
