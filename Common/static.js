@@ -1,9 +1,15 @@
-const dotenv = require('dotenv')
-const dotenvExpand = require('dotenv-expand')
+const dotenv = require('dotenv');
+const dotenvExpand = require('dotenv-expand');
+const path = require('path');
+const os = require('os');
 
-const myEnv = dotenv.config();
-dotenvExpand.expand(myEnv)
-console.log('Environment variables loaded:', myEnv);
+const userHome = os.homedir();
+const externalEnvPath = path.join('C:', 'ProgramData', 'ServerSolutionDefault', '.env');
+
+const myEnv = dotenv.config({ path: externalEnvPath });
+dotenvExpand.expand(myEnv);
+
+console.log('Environment variables loaded from:', externalEnvPath);
 
 const prcEnv = {
   backend_address: process.env.backend_address,
@@ -11,29 +17,12 @@ const prcEnv = {
   backend_version: process.env.backend_version,
   host: process.env.backend_address + ":" + process.env.backend_port,
 
-  // socket_host: process.env.socket_host,
-  // socket_port: process.env.socket_port,
-
   db_host: process.env.db_host,
   db_port: process.env.db_port,
   db_name: process.env.db_name,
   db_username: process.env.db_username,
   db_password: process.env.db_password,
   admin_pass: process.env.admin_pass
-
-  // ecomm_backend_port: process.env.ecomm_backend_port,
-
-  // ecom_db_host: process.env.ecom_db_host,
-  // ecom_db_port: process.env.ecom_db_port,
-  // ecom_db_name: process.env.ecom_db_name,
-  // ecom_db_username: process.env.ecom_db_username,
-  // ecom_db_password: process.env.ecom_db_password,
-
-  // ecom_remote_db_host: process.env.ecom_remote_db_host,
-  // ecom_remote_db_port: process.env.ecom_remote_db_port,
-  // ecom_remote_db_name: process.env.ecom_remote_db_name,
-  // ecom_remote_db_username: process.env.ecom_remote_db_username,
-  // ecom_remote_db_password: process.env.ecom_remote_db_password
 };
 
 const httpSts = {
@@ -46,8 +35,7 @@ const httpSts = {
   ServerError: 500,
 };
 
-module.exports = 
-{
+module.exports = {
   prcEnv,
   httpSts
-}
+};

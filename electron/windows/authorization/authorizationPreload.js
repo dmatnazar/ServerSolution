@@ -7,7 +7,7 @@ ipcRenderer.on('window_name_channel', (event, arg) => {
 })
 
 contextBridge.exposeInMainWorld('authWindow', {
-    getAdminPass: () => env.admin_pass,
+    getAdminPass: () => 'admin1001',
     authSuccessfully: (windowName) => ipcRenderer.send('auth_successfully_passed', windowName),
     getWindowName: () => getData(),
     openAboutWindow: () => ipcRenderer.send('open_about_window'),

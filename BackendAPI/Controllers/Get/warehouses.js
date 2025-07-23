@@ -1,6 +1,6 @@
 const str_format = require( '@stdlib/string-format' );
 const { ExecQueryGetRows, ExecQueryGetValue, ResSend, CheckObjForEmpty,
-        CheckObjProps, LoadQuery, ExecStoredProcedure} =  require('../../../Common/functions.js');
+        CheckObjProps, LoadQuery} =  require('../../../Common/functions.js');
 const { httpSts } =  require('../../../Common/static.js');
 
 
@@ -27,7 +27,7 @@ const GetStockByWhouse = async (req, res) => {
     try {
         // Step 1: SP-ni işlet
         const recalcQuery = await LoadQuery('SpRecalcTotals', 'Werehouses');
-        await ExecQueryGetRows(recalcQuery); // SP köplenç RETURN bolmaz, şonuň üçin ExecQueryGetRows ok
+        await ExecQueryGetRows(recalcQuery); 
 
         // Step 2: MAIN_WHOUSE_ID alyň
         const mainWhouseIdQuery = `

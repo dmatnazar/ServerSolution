@@ -288,21 +288,23 @@ function CalculateNewSize(width, height, targetSize) {
 
 
 // For save query
-const queryCache = {};``
+const queryCache = {};
+
 const LoadQuery = async (fileName, subFolder, params = []) => {
     const cacheKey = `${subFolder}/${fileName}`;
     if (queryCache[cacheKey]) {
         return processQuery(queryCache[cacheKey], params);
     }
+
     try {
-        const projectRoot = path.resolve(__dirname, '..');
-        const queryPath = path.join(projectRoot, 'Queries', subFolder, `${fileName}.sql`);
+        // Project salgy däl, global salgy ulanylýar:
+        const baseQueryDir = path.join('C:', 'ProgramData', 'ServerSolutionDefault', 'Queries');
+        const queryPath = path.join(baseQueryDir, subFolder, `${fileName}.sql`);
 
-        //console.log("Query path barlanyar:", queryPath);
-        //console.log("Bar?:", fs.existsSync(queryPath));
-
+        // Query oka
         const query = fs.readFileSync(queryPath, 'utf8');
         queryCache[cacheKey] = query;
+
         return processQuery(query, params);
     } catch (err) {
         throw new Error(`Failed to read SQL file: ${subFolder}/${fileName}.sql - ${err.message}`);
@@ -323,16 +325,34 @@ const processQuery = (query, params) => {
     return resultQuery;
 };
 
-/**
- * Executes a stored procedure from SQL file (without output params).
- * @param {string} fileName 
- * @param {string} subFolder 
- * @returns {Promise<void>}
- */
-const ExecStoredProcedure = async (fileName, subFolder) => {
-    const spQuery = await LoadQuery(fileName, subFolder);
-    return await ExecQueryGetRows(spQuery);
-};
+// /**
+//  * Executes a stored procedure from SQL file (without output params).
+//  * @param {string} fileName 
+//  * @param {string} subFolder 
+//  * @returns {Promise<void>}
+//  */
+// const ExecStoredProcedure = async (fileName, subFolder) => {
+//     const spQuery = await LoadQuery(fileName, subFolder);
+//     return await ExecQueryGetRows(spQuery);
+// };
+
+// //=====================================================================16
+
+// function FindEnv() {
+//   const baseDir = path.join(process.env.APPDATA || '', 'ServerSolution_');
+//   const parentDir = path.dirname(baseDir); // C:\Users\Default\AppData\Roaming
+
+//   if (!fs.existsSync(parentDir)) {
+//     return false;
+//   }
+
+//   const dirs = fs.readdirSync(parentDir, { withFileTypes: true });
+//   const found = dirs.some(dir =>
+//     dir.isDirectory() && dir.name.startsWith('ServerSolution_')
+//   );
+
+//   return found;
+// }
  
 module.exports = {
   ExecQueryGetRows,
@@ -351,5 +371,6 @@ module.exports = {
   ImageUploader,
   ImageCompress,
   LoadQuery,
-  ExecStoredProcedure
+  // ExecStoredProcedure,
+  // FindEnv
 };

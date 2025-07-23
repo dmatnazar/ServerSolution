@@ -1,8 +1,7 @@
 const { app, BrowserWindow, ipcMain, nativeImage, Tray, Menu, dialog, net } = require('electron')
 const path = require('path')
 const fs = require('fs')
-
-
+require('../Common/copySetup');
 const { ObjectToENV } = require('./utils/HelperFunction')
 const { prcEnv: env, } = require('../Common/static')
 const { TryConnToSql: TryConnToServer, sqlConfig: sqlConn } = require('../Common/mssql')
@@ -15,7 +14,8 @@ const moment = require('moment')
 
 let connectionWin = null, authorizationWin = null, globalContextMenu = null, tray = null;
 let settingsWinTitleForAuth = "Connection Settings "
-const envPath = path.join(process.cwd(), '.env')
+const envPath = path.join('C:', 'ProgramData', 'ServerSolutionDefault', '.env');
+// const envPath = path.join(process.cwd(), '.env')
 
 log.initialize();
 const level = process.env.NODE_ENV === 'development' ? 'debug' : 'silly'
@@ -238,7 +238,7 @@ async function Checkers() {
 
 //For save queries
 ipcMain.handle('get-queries-list', async () => {
-    const queriesPath = path.join(__dirname, '..', 'queries'); // 🟢 Tassyklanan çözgüt
+    const queriesPath = path.join(__dirname, '..', 'queries');
     console.log('🔍 queriesPath:', queriesPath);
 
     if (!fs.existsSync(queriesPath)) {
@@ -266,7 +266,7 @@ ipcMain.handle('open-query-editor', async (event, folder, filename) => {
         webPreferences: {
             preload: path.join(__dirname, 'windows/queryEditor/editorPreload.js'),
             contextIsolation: true,
-            nodeIntegration: false, // ✅ Howpsuzlyk üçin gerek
+            nodeIntegration: false,
         }
     });
 
@@ -330,24 +330,28 @@ ipcMain.on('close_connection_window', () => {
     log.info('Connection window closed')
 })
 
-ipcMain.on('save_to_env', async (event, args) => {
 
-    let parsedData = JSON.parse(args)
-    let assigned = Object.assign(env, parsedData)
+ipcMain.on('save_to_env', async (event, args) => {
+    let parsedData = JSON.parse(args);
+    let assigned = Object.assign({}, process.env, parsedData); // Esasy env + täze maglumatlar
+
     Object.keys(assigned).forEach((item) => {
-        process.env[item] = assigned[item]
-    })
-    let envFormat = ObjectToENV(assigned)
+        process.env[item] = assigned[item];
+    });
+
+    let envFormat = ObjectToENV(assigned);
+
     fs.writeFile(envPath, envFormat, async (err) => {
         if (err) {
-            log.error('Error occured while new config data writing to env: ', err)
+            log.error('Error occurred while writing new config data to .env:', err);
+            return;
         }
-        log.info('Successfully saved data to env.')
-        restartApp()
-        BrowserWindow.getFocusedWindow().close()
-    })
+        log.info('Successfully saved data to .env');
+        restartApp(); // Restart logikasy sizde öň bar bolsa şol ulanýar
+        BrowserWindow.getFocusedWindow().close();
+    });
+});
 
-})
 ipcMain.on('get-version', (event) => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'packageCopy.json'), 'utf8'));
     event.returnValue = `${packageJson.name}  v${packageJson.version}`;

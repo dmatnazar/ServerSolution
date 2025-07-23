@@ -10,7 +10,8 @@
     "clearENV": "node ./removeEnvUnused.js",
     "backend": "nodemon ./BackendAPI/server.js",
     "build": "electron-builder --publish never",
-    "deploy": "electron builder --publish always"
+    "deploy": "electron builder --publish always",
+    "start": "node Common/copySetup.js && node app.js"
   },
   "author": "Hasabym #developers",
   "license": "ISC",
