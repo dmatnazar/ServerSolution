@@ -1,3 +1,4 @@
+--sakdalskdla
 SELECT
 	i.material_id,
 	i.image_id,

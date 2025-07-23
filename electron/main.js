@@ -352,25 +352,25 @@ ipcMain.on('save_to_env', async (event, args) => {
     });
 });
 
+const fs1 = require('fs').promises;
 ipcMain.handle('read-default-query', async (event, defaultPath) => {
   try {
-    console.log('Reading default query from:', defaultPath);
-    
-    const exists = await fs.access(defaultPath).then(() => true).catch(() => false);
-    if (!exists) {
-      console.error('Default query file does not exist:', defaultPath);
-      return null;
-    }
-    
-    const content = await fs.readFile(defaultPath, 'utf8');
-    console.log('Successfully read default query, length:', content.length);
+    console.log('[DEBUG] Input path:', defaultPath);
+
+    const resolvedPath = path.resolve(defaultPath);
+    console.log('[DEBUG] Resolved path:', resolvedPath);
+
+    await fs1.access(resolvedPath); // << BU YERDE DÜZGÜN fs1 ulanmaly
+    const content = await fs1.readFile(resolvedPath, 'utf8');
+
+    console.log('[READ] Content length:', content.length);
     return content;
-  } catch (error) {
-    console.error('Error reading default query:', error);
+
+  } catch (err) {
+    console.error('[ERROR] reading default query:', err.message);
     return null;
   }
 });
-
 ipcMain.on('get-version', (event) => {
     const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'packageCopy.json'), 'utf8'));
     event.returnValue = `${packageJson.name}  v${packageJson.version}`;

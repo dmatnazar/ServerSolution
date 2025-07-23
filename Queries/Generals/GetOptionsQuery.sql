@@ -5,5 +5,4 @@ FROM
 	tbl_br_general_info 
 WHERE
 	info_name NOT IN (
-	'ONLINE_SYNC_STATUS',
-	'MAIN_WAREHOUSE_ID')
+	'ONLINE_SYNC_STATUS')

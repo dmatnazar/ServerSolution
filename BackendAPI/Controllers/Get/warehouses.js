@@ -9,8 +9,8 @@ const GetWarehouses = async (req, res) => {
     try {
         let params = req.query['is_hosting'];
         let query = CheckObjForEmpty(params)
-            ? await LoadQuery('warehouses_with_firm' , 'Werehouses')
-            : await LoadQuery('warehouse_list_with_status' , 'Werehouses');
+            ? await LoadQuery('WarehousesWithFirm' , 'Werehouses')
+            : await LoadQuery('WarehouseListWithStatus' , 'Werehouses');
 
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
@@ -44,7 +44,7 @@ const GetStockByWhouse = async (req, res) => {
 
         // Step 4: Eger başga sklad soralsa — goşmaça stock çek
         if (CheckObjProps(obj, requiredProps) && obj['whouse_id'] !== main_whouse_id) {
-            const otherStockQuery = await LoadQuery('other_wh_stock', 'Warehouses', [
+            const otherStockQuery = await LoadQuery('OtherWhStock', 'Warehouses', [
                 obj['seller_id'], obj['whouse_id']
             ]);
             other_wh_stock = await ExecQueryGetRows(otherStockQuery);

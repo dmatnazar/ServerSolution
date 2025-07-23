@@ -1,3 +1,4 @@
+--asdaskdjaskdaks
 SELECT
 	image_pict,
 	DATALENGTH ( image_pict ) AS image_size 
