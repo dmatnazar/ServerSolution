@@ -5,11 +5,6 @@ const fs = require('fs').promises; // Asinhron faýl okamak üçin
 const path = require('path');
 const { rows } = require('mssql');
 
-const GetRoutePlansMainQuery = LoadQuery('GetRoutePlansMainQuery', 'Generals');
-const GetRouteDetailsQuery = LoadQuery('GetRouteDetailsQuery', 'Generals');
-const GetRoutePartnersQuery = LoadQuery('GetRoutePartnersQuery', 'Generals');
-
-
 
 const GetOptions = async (req, res) => {
     const query = await LoadQuery('GetOptionsQuery', 'Generals');

@@ -10,13 +10,14 @@ window.queryEditor.onLoad(({ filename, content, fullPath }) => {
   editor = CodeMirror.fromTextArea(document.getElementById('code-area'), {
     mode: 'text/x-sql',
     theme: 'material-darker',
+    mode: "sql",
     lineNumbers: true,
     indentWithTabs: true,
     smartIndent: true,
     matchBrackets: true,
     autofocus: true
   });
-
+  editor.setSize(null, '100%');
   editor.setValue(content);
 });
 

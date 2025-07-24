@@ -288,71 +288,50 @@ function CalculateNewSize(width, height, targetSize) {
 
 
 // For save query
+
 const queryCache = {};
 
-const LoadQuery = async (fileName, subFolder, params = []) => {
-    const cacheKey = `${subFolder}/${fileName}`;
-    if (queryCache[cacheKey]) {
-        return processQuery(queryCache[cacheKey], params);
-    }
+// 🔄 Esasy funksiýa: SQL faýlyny okaýar we cache ulanýar
+async function LoadQuery(fileName, subFolder, params = [], forceReload = false) {
+  const cacheKey = `${subFolder}/${fileName}`;
 
-    try {
-        // Project salgy däl, global salgy ulanylýar:
-        const baseQueryDir = path.join('C:', 'ProgramData', 'ServerSolutionDefault', 'Queries');
-        const queryPath = path.join(baseQueryDir, subFolder, `${fileName}.sql`);
+  if (!forceReload && queryCache[cacheKey]) {
+    return processQuery(queryCache[cacheKey], params);
+  }
 
-        // Query oka
-        const query = fs.readFileSync(queryPath, 'utf8');
-        queryCache[cacheKey] = query;
+  try {
+    const baseQueryDir = path.join('C:', 'ProgramData', 'ServerSolutionDefault', 'Queries');
+    const queryPath = path.join(baseQueryDir, subFolder, `${fileName}.sql`);
+    const query = fs.readFileSync(queryPath, 'utf8');
 
-        return processQuery(query, params);
-    } catch (err) {
-        throw new Error(`Failed to read SQL file: ${subFolder}/${fileName}.sql - ${err.message}`);
-    }
-};
+    queryCache[cacheKey] = query;
+    return processQuery(query, params);
+  } catch (err) {
+    throw new Error(`[loadQuery] Failed to read ${subFolder}/${fileName}.sql: ${err.message}`);
+  }
+}
 
-const processQuery = (query, params) => {
-    let resultQuery = query;
-    params.forEach((param, index) => {
-        // Parametriň tipini barlaýas
-        const replacement = param === undefined || param === null 
-            ? 'NULL'
-            : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
-            ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
-            : typeof param === 'string' ? `'${param}'` : param; // San bolsa, dykyzsyz goşmaly
-        resultQuery = resultQuery.replace(new RegExp(`\\{${index}\\}`, 'g'), replacement);
-    });
-    return resultQuery;
-};
+// 🧹 Cache-den belli bir faýly aýyrýar
+function InvalidateQueryCache(fileName, subFolder) {
+  const cacheKey = `${subFolder}/${fileName}`;
+  delete queryCache[cacheKey];
+}
 
-// /**
-//  * Executes a stored procedure from SQL file (without output params).
-//  * @param {string} fileName 
-//  * @param {string} subFolder 
-//  * @returns {Promise<void>}
-//  */
-// const ExecStoredProcedure = async (fileName, subFolder) => {
-//     const spQuery = await LoadQuery(fileName, subFolder);
-//     return await ExecQueryGetRows(spQuery);
-// };
+// 🔄 Ähli cache-i arassalaýar (isleseň)
+function ClearAllQueryCache() {
+  Object.keys(queryCache).forEach(key => delete queryCache[key]);
+}
 
-// //=====================================================================16
+// Parametr bilen query-ni işleýän funksiýa (islegiňize görä düzediň)
+function processQuery(query, params = []) {
+  // Ýönekeý ýer tutujy bilen çalyşmak
+  let processed = query;
+  params.forEach((val, idx) => {
+    processed = processed.replace(`$${idx + 1}`, val);
+  });
+  return processed;
+}
 
-// function FindEnv() {
-//   const baseDir = path.join(process.env.APPDATA || '', 'ServerSolution_');
-//   const parentDir = path.dirname(baseDir); // C:\Users\Default\AppData\Roaming
-
-//   if (!fs.existsSync(parentDir)) {
-//     return false;
-//   }
-
-//   const dirs = fs.readdirSync(parentDir, { withFileTypes: true });
-//   const found = dirs.some(dir =>
-//     dir.isDirectory() && dir.name.startsWith('ServerSolution_')
-//   );
-
-//   return found;
-// }
  
 module.exports = {
   ExecQueryGetRows,
@@ -371,6 +350,6 @@ module.exports = {
   ImageUploader,
   ImageCompress,
   LoadQuery,
-  // ExecStoredProcedure,
-  // FindEnv
+  InvalidateQueryCache,
+  ClearAllQueryCache,
 };

@@ -23,21 +23,22 @@ const GetWarehouses = async (req, res) => {
 const GetStockByWhouse = async (req, res) => {
     const obj = req.query;
     const requiredProps = ['seller_id', 'whouse_id'];
-
+    console.log('Requested parameters:', requiredProps);
     try {
         // Step 1: SP-ni işlet
         const recalcQuery = await LoadQuery('SpRecalcTotals', 'Werehouses');
         await ExecQueryGetRows(recalcQuery); 
-
+        console.log("Recalc SP" , recalcQuery)
         // Step 2: MAIN_WHOUSE_ID alyň
         const mainWhouseIdQuery = `
             SELECT ISNULL(info_value, 0) AS main_whouse_id 
             FROM tbl_br_general_info 
             WHERE info_name = 'MAIN_WAREHOUSE_ID'`;
         const main_whouse_id = await ExecQueryGetValue(mainWhouseIdQuery, 'main_whouse_id');
-
+        console.log('Main warehouse ID:', main_whouse_id);
         // Step 3: Main sklad üçin stock
         const mainStockQuery = await LoadQuery('MainWhStock', 'Werehouses', [main_whouse_id]);
+        console.log('Main stock query:', str_format(mainStockQuery, [main_whouse_id]));
         const main_wh_stock = await ExecQueryGetRows(mainStockQuery);
 
         let other_wh_stock = null;

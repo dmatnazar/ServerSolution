@@ -6,7 +6,7 @@ const { ObjectToENV } = require('./utils/HelperFunction')
 const { prcEnv: env, } = require('../Common/static')
 const { TryConnToSql: TryConnToServer, sqlConfig: sqlConn } = require('../Common/mssql')
 const { Main, app_exp } = require('../BackendAPI/server')
-const { SendPing } = require('../Common/functions')
+const { SendPing, InvalidateQueryCache} = require('../Common/functions')
 // const { CheckConnectionStatusEvent } = require('../Common/events')
 
 const log = require('electron-log')
@@ -238,7 +238,7 @@ async function Checkers() {
 
 //For save queries
 ipcMain.handle('get-queries-list', async () => {
-    const queriesPath = path.join(__dirname, '..', 'queries');
+    const queriesPath = path.join('C:\\ProgramData\\ServerSolutionDefault\\Queries');
     console.log('🔍 queriesPath:', queriesPath);
 
     if (!fs.existsSync(queriesPath)) {
@@ -274,8 +274,8 @@ ipcMain.handle('open-query-editor', async (event, folder, filename) => {
 
     // 🟢 Extension barlanýar we gerek bolsa goşulýar
     const finalFilename = filename.endsWith('.sql') ? filename : `${filename}.sql`;
-    const fullPath = path.join(__dirname, '..' , 'Queries', folder, finalFilename);
-
+    const fullPath = path.join('C:\\ProgramData\\ServerSolutionDefault\\Queries', folder, finalFilename);
+    console.log('🔍 Full path to query file:', fullPath);
     try {
         const content = fs.readFileSync(fullPath, 'utf-8');
         queryWindow.webContents.send('load-file-content', {
@@ -299,6 +299,9 @@ ipcMain.handle('save-query-file', async (event, filePath, content) => {
     try {
         fs.writeFileSync(filePath, content, 'utf-8');
         console.log('File saved:', filePath);
+        const folderName = path.basename(path.dirname(filePath));
+        const queryName = path.basename(filePath, '.sql');        
+        InvalidateQueryCache(queryName, folderName);
     } catch (err) {
         console.error('Failed to save file:', err);
         throw err;

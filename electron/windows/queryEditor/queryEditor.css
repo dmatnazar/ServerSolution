@@ -25,6 +25,9 @@ body {
     gap: 10px;
     border-bottom: 1px solid #444;
     align-items: center;
+    position: sticky; /* ýa-da position: fixed; */
+    top: 0; /* sticky ýa-da fixed ulanylanda ulgam ýokaryda saklanar */
+    z-index: 100; /* Beýleki elementlerden üstün bolýar */
 }
 
 #navbar button {
@@ -59,11 +62,10 @@ body {
 
 #editor-container {
     flex: 1;
-    display: flex;
     flex-direction: column;
-    padding: 10px;
+    min-height: calc(100vh - 100px);
+    margin-top: 50px; /* Navbar-nyň beýikligine görä üýtgedilip bilner */
 }
-
 .CodeMirror {
     flex: 1;
     height: 100%;
