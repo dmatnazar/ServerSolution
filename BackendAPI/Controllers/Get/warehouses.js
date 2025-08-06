@@ -7,18 +7,28 @@ const { httpSts } =  require('../../../Common/static.js');
 
 const GetWarehouses = async (req, res) => {
     try {
-        let params = req.query['is_hosting'];
-        let query = CheckObjForEmpty(params)
-            ? await LoadQuery('WarehousesWithFirm' , 'Werehouses')
-            : await LoadQuery('WarehouseListWithStatus' , 'Werehouses');
+        let isHosting = req.query['is_hosting'];
+        // console.log('is_hosting param:', isHosting);
+
+        let query;
+
+        // Parametr BAR bolsa we DOLY bolsa (false = NOT empty) — hosting üçin sorag
+        if (isHosting !== undefined && isHosting !== null && isHosting !== '') {
+            query = await LoadQuery('WarehousesWithFirm', 'Werehouses');
+        } else {
+            // Parametr ýok bolsa ýa-da boş bolsa — adaty ammar sanawy
+            query = await LoadQuery('WarehouseListWithStatus', 'Werehouses');
+        }
 
         let rows = await ExecQueryGetRows(query);
-        ResSend(res, httpSts.Success, null, rows);
 
+        ResSend(res, httpSts.Success, null, rows);
     } catch (err) {
+        console.error("Error in GetWarehouses:", err);
         ResSend(res, httpSts.ServerError, null, `${err}`);
     }
 };
+
 
 const GetStockByWhouse = async (req, res) => {
     const obj = req.query;
@@ -44,9 +54,9 @@ const GetStockByWhouse = async (req, res) => {
         // console.log('main_whouse_id:', main_whouse_id);
         // Step 3: Main sklad üçin stock
         const mainStockQuery = await LoadQuery('MainWhStock', 'Werehouses', [main_whouse_id]);
-        console.log('mainStockQuery:', mainStockQuery);
+        // console.log('mainStockQuery:', mainStockQuery);
         const main_wh_stock = await ExecQueryGetRows(mainStockQuery);
-        console.log('main_wh_stock:', main_wh_stock);
+        // console.log('main_wh_stock:', main_wh_stock);
 
         let other_wh_stock = null;
 
