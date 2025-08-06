@@ -1,4 +1,4 @@
-\WITH virtual_table AS (
+WITH virtual_table AS (
     SELECT l.material_id, SUM(ISNULL(l.mat_inv_quantity, 0) * ISNULL(unit_det_conv2, 1)) AS amount_in_whorder
     FROM tbl_mg_mat_inv_head i 
     JOIN tbl_mg_mat_inv_line l ON i.mat_inv_head_id = l.mat_inv_head_id

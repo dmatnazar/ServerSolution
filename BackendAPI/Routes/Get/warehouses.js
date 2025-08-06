@@ -5,11 +5,11 @@ const router = express.Router();
 const { GetWarehouses, GetPersonalStock, GetStockByWhouse
 } = require('../../Controllers/Get/warehouses.js');
 
-let routes_array = [ 'warehouse_data', 'personal_stock', 'stock_by_whouse'];
+let routes_array = [ 'werehouse_data', 'personal_stock', 'stock_by_whouse'];
 router.get('/', (req, res) => {
         res.render('index', {
                 data: routes_array,
-                type: 'get_warehouses',
+                type: 'get_werehouses',
                 url: req.originalUrl,
         })
 })

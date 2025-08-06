@@ -7,8 +7,6 @@ const { SendPing } = require("../../../Common/functions")
 
 
 
-
-
 contextBridge.exposeInMainWorld('connectionWindow', {
     getEnv: () => {
         return {
@@ -22,4 +20,11 @@ contextBridge.exposeInMainWorld('connectionWindow', {
     saveToEnv: (config) => ipcRenderer.send('save_to_env', JSON.stringify(config)),
     getQueriesList: () => ipcRenderer.invoke('get-queries-list'),
     openQueryEditor: (folderName, fileName) => ipcRenderer.invoke('open-query-editor', folderName, fileName),
+    onLoad: (callback) => ipcRenderer.on('load-file-content', (event, data) => callback(data)),
+    saveFile: (path, content) => ipcRenderer.invoke('save-query-file', path, content),
+    readDefaultQuery: (defaultPath) => ipcRenderer.invoke('read-default-query', defaultPath),
+    getFolders: () => ipcRenderer.invoke('get-folders'),
+    copyFolder: (newName) => ipcRenderer.invoke('copy-folder', newName),
+    renameFolder: (oldName, newName) => ipcRenderer.invoke('rename-folder', oldName, newName),
+    deleteFolder: (name) => ipcRenderer.invoke('delete-folder', name) 
 });

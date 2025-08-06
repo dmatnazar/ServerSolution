@@ -5,6 +5,11 @@ const fs = require('fs').promises; // Asinhron faýl okamak üçin
 const path = require('path');
 const { rows } = require('mssql');
 
+const GetRoutePlansMainQuery = LoadQuery('GetRoutePlansMainQuery', 'Generals');
+const GetRouteDetailsQuery = LoadQuery('GetRouteDetailsQuery', 'Generals');
+const GetRoutePartnersQuery = LoadQuery('GetRoutePartnersQuery', 'Generals');
+
+
 
 const GetOptions = async (req, res) => {
     const query = await LoadQuery('GetOptionsQuery', 'Generals');
@@ -169,9 +174,9 @@ const GetContacts = async (req, res) => {
             // operand we guid-i bir params massiwine birleşdirýäs
             const params = [operand, guid];
             const query = await LoadQuery('GetContactsQuery', 'Generals', params);
-            console.log('SQL Query after replacement:', query); // Çalşylandan soňky soragy barlamak
+            // console.log('SQL Query after replacement:', query); // Çalşylandan soňky soragy barlamak
             const rows = await ExecQueryGetRows(query);
-            console.log("GetContacts rows:", rows);
+            // console.log("GetContacts rows:", rows);
             ResSend(res, httpSts.Success, null, rows);
         } catch (err) {
             console.error('Ýalňyşlyk:', err);

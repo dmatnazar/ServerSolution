@@ -66,6 +66,7 @@ const AddOrder = async (req, res) =>
                             .input('fich_id', sql.Int, order_id)
 
                     /*let response =*/ await request.execute('sp_mg_del_order_line');
+                    await request.execute('sp_mg_del_order_inv');
                     //console.log('sp_mg_del_order_inv res:', response);
                 }
             }

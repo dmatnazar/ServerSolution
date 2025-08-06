@@ -69,7 +69,7 @@ const GetMaterialsImgID = async(req, res) =>
     try
     {
         const query = await LoadQuery('GetMaterialsImgIDQuery', 'Materials');
-        console.log('Material_id -----------' , query)
+        // console.log('Material_id -----------' , query)
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -82,10 +82,10 @@ const GetMaterialsImgID = async(req, res) =>
 const GetMaterialImage = async (req, res) => {
     try {
         let image_id = req.query['image_id'];
-        console.log('image_id-------', image_id)
+        // console.log('image_id-------', image_id)
         if (CheckObjForEmpty(image_id)) {
             const query = await LoadQuery('GetMaterialImageQuery', 'Materials', [image_id]);
-            console.log('query------------' , query)
+            // console.log('query------------' , query)
             const sqlConnPool = await GetConnPool();
             let result = await sqlConnPool.request().query(query);
 

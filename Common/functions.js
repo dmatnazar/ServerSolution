@@ -288,14 +288,10 @@ function CalculateNewSize(width, height, targetSize) {
 
 
 // For save query
-
-const queryCache = {};
-
-// 🔄 Esasy funksiýa: SQL faýlyny okaýar we cache ulanýar
-async function LoadQuery(fileName, subFolder, params = [], forceReload = false) {
+const queryCache = {};``
+const LoadQuery = async (fileName, subFolder, params = []) => {
   const cacheKey = `${subFolder}/${fileName}`;
-
-  if (!forceReload && queryCache[cacheKey]) {
+    if (queryCache[cacheKey]) {
     return processQuery(queryCache[cacheKey], params);
   }
 
@@ -323,15 +319,30 @@ function ClearAllQueryCache() {
 }
 
 // Parametr bilen query-ni işleýän funksiýa (islegiňize görä düzediň)
-function processQuery(query, params = []) {
-  // Ýönekeý ýer tutujy bilen çalyşmak
-  let processed = query;
-  params.forEach((val, idx) => {
-    processed = processed.replace(`$${idx + 1}`, val);
-  });
-  return processed;
-}
+const processQuery = (query, params) => {
+    let resultQuery = query;
+    params.forEach((param, index) => {
+        // Parametriň tipini barlaýas
+        const replacement = param === undefined || param === null 
+            ? 'NULL'
+            : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
+            ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
+            : typeof param === 'string' ? `'${param}'` : param; // San bolsa, dykyzsyz goşmaly
+        resultQuery = resultQuery.replace(new RegExp(`\\{${index}\\}`, 'g'), replacement);
+    });
+    return resultQuery;
+};
 
+/**
+ * Executes a stored procedure from SQL file (without output params).
+ * @param {string} fileName 
+ * @param {string} subFolder 
+ * @returns {Promise<void>}
+ */
+const ExecStoredProcedure = async (fileName, subFolder) => {
+    const spQuery = await LoadQuery(fileName, subFolder);
+    return await ExecQueryGetRows(spQuery);
+};
  
 module.exports = {
   ExecQueryGetRows,
@@ -352,4 +363,5 @@ module.exports = {
   LoadQuery,
   InvalidateQueryCache,
   ClearAllQueryCache,
+  ExecStoredProcedure
 };

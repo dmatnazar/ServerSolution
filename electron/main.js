@@ -308,6 +308,53 @@ ipcMain.handle('save-query-file', async (event, filePath, content) => {
     }
 });
 
+ipcMain.handle('get-folders', async () => {
+  const baseDir = 'C:\\ProgramData';
+  let folders = [];
+
+  try {
+    const entries = fs.readdirSync(baseDir);
+    for (const entry of entries) {
+      const fullPath = path.join(baseDir, entry);
+      try {
+        const stats = fs.statSync(fullPath);
+        if (stats.isDirectory() && entry.startsWith('ServerSolution')) {
+          folders.push(entry);
+        }
+      } catch (err) {
+        // Skip files we can't access (like ntuser.pol)
+        continue;
+      }
+    }
+  } catch (err) {
+    console.error('Error reading folders:', err);
+  }
+
+  return folders;
+});
+
+// Rename and delete folders
+ipcMain.handle('rename-folder', async (event, oldName, newName) => {
+  const oldPath = path.join('C:/ProgramData', 'ServerSolution' + oldName);
+  const newPath = path.join('C:/ProgramData', 'ServerSolution' + newName);
+  await fs.promises.rename(oldPath, newPath);
+});
+
+ipcMain.handle('delete-folder', async (event, name) => {
+  const folderPath = path.join('C:/ProgramData', 'ServerSolution' + name);
+  await fs.promises.rm(folderPath, { recursive: true, force: true });
+});
+
+// Copy folder
+ipcMain.handle('copy-folder', async (event, newName) => {
+  const baseDir = 'C:\\ProgramData';
+  const source = path.join(baseDir, 'ServerSolutionDefault');
+  const target = path.join(baseDir, `ServerSolution${newName}`);
+  fs.cpSync(source, target, { recursive: true });
+  return `ServerSolution${newName}`;
+});
+
+
 ipcMain.on('open_about_window', (event, arg) => {
     BrowserWindow.getFocusedWindow().close()
     createAboutWindow()

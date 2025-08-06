@@ -14,7 +14,7 @@ const GetSalesByMaterials = async (req, res) => {
             const startDate = ConvertToSQLFormat(data_obj['dt_begin']);
             const endDate = ConvertToSQLFormat(data_obj['dt_end']);
             const seller_id = parseInt(data_obj['seller_id']);
-            console.log('startDate' , startDate , 'endDate', endDate , 'seller_id---' , seller_id)
+            // console.log('startDate' , startDate , 'endDate', endDate , 'seller_id---' , seller_id)
 
             // if (CheckObjForEmpty(seller_id) || seller_id > 0) {
             //     return ResSend(res, httpSts.BadRequest, 'Invalid seller_id!', null);
@@ -26,7 +26,7 @@ const GetSalesByMaterials = async (req, res) => {
             //     ConvertToSQLFormat(data_obj["dt_begin"]),
             //     ConvertToSQLFormat(data_obj["dt_end"]),
             //     `${data_obj["seller_id"]}`
-            console.log('query------' , query)
+            // console.log('query------' , query)
 
 
             const rows = await ExecQueryGetRows(query);

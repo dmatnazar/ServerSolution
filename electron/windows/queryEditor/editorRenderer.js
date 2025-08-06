@@ -128,8 +128,8 @@ function getDefaultQueryPath(filename) {
     'GetPersonalStockQuery.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\GetPersonalStockQuery.sql',
     'MainWhStock.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\MainWhStock.sql',
     'SpRecalcTotals.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\SpRecalcTotals.sql',
-    'warehouses_with_firm.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\warehouses_with_firm.sql',
-    'warehouse_list_with_status.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\warehouse_list_with_status.sql'
+    'WarehousesWithFirm.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\WarehousesWithFirm.sql',
+    'warehouseListWithStatus.sql': 'C:\\ProgramData\\ServerSolutionDefault\\QueriesDefoult\\Werehouses\\WarehouseListWithStatus.sql'
   };
   
   return defaultPaths[filename];

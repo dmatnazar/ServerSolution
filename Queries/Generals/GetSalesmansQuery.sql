@@ -1,4 +1,5 @@
 SELECT
+	LOWER(firm_id_guid) AS firm_guid,
 	s.salesman_id AS seller_id,
 	a.arap_code AS seller_code,
 	salesman_name AS seller_name,

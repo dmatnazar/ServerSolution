@@ -11,6 +11,42 @@
 
 <body>
     <main class="main_block">
+        <div class="navbar">
+            <div class="navbar_wrapper">
+                <div class="navbar_title">
+                    <h1>Connection settings</h1>
+                </div>
+                <!-- Tabs shown -->
+                <div class="tabs_wrapper">
+                    <div class="tabs" id="tabs_container">
+                        <!-- dynamic tablar soň goşular -->
+                        <button class="tab" id="add_tab">+</button>
+                    </div>
+                </div>
+                <!-- Input for new tab -->
+                <div id="tab_input_wrapper" style="display: none; margin-left: 10px;">
+                    <input type="text" id="new_tab_input" placeholder="New tab name" />
+                    <button id="create_tab_btn">Create</button>
+                </div>
+                <!-- Context Menu -->
+                <div id="tab_context_menu" class="context-menu" style="display: none;">
+                    <div class="context-option" data-action="duplicate">Duplicate</div>
+                    <div class="context-option" data-action="rename">Rename</div>
+                    <div class="context-option" data-action="delete">Delete</div>
+                </div>
+
+                <div id="rename_modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <h3>Rename Tab</h3>
+                        <input type="text" id="rename_input" />
+                        <div class="modal-buttons">
+                            <button id="rename_cancel_btn">Cancel</button>
+                            <button id="rename_confirm_btn">Rename</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="main_div_block">
             <div>
                 <div class="backend_settings">
@@ -18,6 +54,8 @@
                         <label for="backend_addres">Backend address</label>
                         <div>
                             <input type="text" id="backend_address" name="backend_addres">
+                        </div>
+                        <div>
                             <button class="refresh_btn" id="backend_refresh_btn">
                                 <div id="refresh_icon_wrapper">
                                     <img id="backend_refresh_icon" src="../../assets/icons/refresh_icon.png"
@@ -32,11 +70,11 @@
                     </div>
                     <div>
                         <label for="backend_port">Backend port</label>
-                        <input type="number" id="backend_port" name="backend_port" style="width: 15%">
+                        <input type="number" id="backend_port" name="backend_port">
                     </div>
                     <div>
                         <label for="backend_version">Backend version</label>
-                        <input type="text" id="backend_version" name="backend_version" style="width: 15%;">
+                        <input type="text" id="backend_version" name="backend_version">
                     </div>
                     <p id="backend_settings_err_msg" class="err_msg"></p>
                 </div>
@@ -46,6 +84,8 @@
                         <label for="db_host">Host</label>
                         <div>
                             <input type="text" id="db_host" name="db_host">
+                        </div>
+                        <div>
                             <button class="refresh_btn" id="db_refresh_btn">
                                 <div id="refresh_icon_wrapper">
                                     <img id="db_refresh_icon" src="../../assets/icons/refresh_icon.png"
@@ -60,19 +100,19 @@
                     </div>
                     <div>
                         <label for="db_port">Database port</label>
-                        <input type="number" id="db_port" name="db_port" style="width: 15%;">
+                        <input type="number" id="db_port" name="db_port">
                     </div>
                     <div>
                         <label for="db_name">Database name</label>
-                        <input type="text" id="db_name" name="db_name" style="width: 60%;">
+                        <input type="text" id="db_name" name="db_name">
                     </div>
                     <div>
                         <label for="db_username">Username</label>
-                        <input type="text" id="db_username" name="db_username" style="width: 60%;">
+                        <input type="text" id="db_username" name="db_username">
                     </div>
                     <div>
                         <label for="db_password">Password</label>
-                        <input type="password" id="db_password" name="db_password" style="width: 60%;">
+                        <input type="password" id="db_password" name="db_password">
                     </div>
                     <div class="test_conn_wrapper">
                         <div id="db_settings_err_msg" class="err_msg"> </div>
@@ -85,7 +125,6 @@
                         </button>
                     </div>
                 </div>
-                <hr>
                 <div class="query_editor">
                     <h1>Query'es</h1>
                 </div>
