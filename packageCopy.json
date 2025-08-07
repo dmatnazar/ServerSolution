@@ -13,7 +13,7 @@
     "deploy": "electron builder --publish always",
     "start": "node Common/copySetup.js && node app.js"
   },
-  "author": "Hasabym #developers",
+  "author": "HasabymGroup #developers",
   "license": "ISC",
   "dependencies": {
     "@stdlib/string-format": "^0.2.1",
