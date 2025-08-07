@@ -102,6 +102,15 @@ document.addEventListener('click', (e) => {
     hideContextMenu();
   }
 });
+//add_tab input //
+document.getElementById('add_tab').addEventListener('click', () => {
+  document.getElementById('tab-input-overlay').style.display = 'flex';
+  document.getElementById('new_tab_input').value = '';
+});
+
+document.getElementById('cancel_tab_btn').addEventListener('click', () => {
+  document.getElementById('tab-input-overlay').style.display = 'none';
+});
 
 async function DatabaseRefreshFunction(db_host, db_refresh_icon, db_checked_icon, db_error_icon) {
     let res = false;
@@ -294,6 +303,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     createTabBtn.addEventListener('click', async () => {
         const name = newTabInput.value.trim();
         if (!name) return;
+        document.getElementById('tab-input-overlay').style.display = 'none';
 
         try {
             await window.connectionWindow.copyFolder(name);

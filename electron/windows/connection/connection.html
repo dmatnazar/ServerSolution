@@ -24,9 +24,15 @@
                     </div>
                 </div>
                 <!-- Input for new tab -->
-                <div id="tab_input_wrapper" style="display: none; margin-left: 10px;">
-                    <input type="text" id="new_tab_input" placeholder="New tab name" />
-                    <button id="create_tab_btn">Create</button>
+                <div id="tab-input-overlay">
+                    <div id="tab-input-dialog">
+                        <h4>Täze Tab Döret</h4>
+                        <input type="text" id="new_tab_input" placeholder="Tab adyny giriziň..." />
+                        <div class="input-buttons">
+                            <button id="create_tab_btn">Döret</button>
+                            <button id="cancel_tab_btn">Ýatyr</button>
+                        </div>
+                    </div>
                 </div>
                 <!-- Context Menu -->
                 <div id="tab_context_menu" class="context-menu" style="display: none;">

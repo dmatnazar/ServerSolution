@@ -125,37 +125,90 @@ body {
 .tab.dynamic-tab {
   background-color: #3a3a3a;
 }
-
-#add_tab {
-  background-color: #1a1a1a;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 6px 14px;
-}
-
-#add_tab:hover {
-  background-color: #444;
-}
-
-/* === TAB INPUT WRAPPER === */
-#tab_input_wrapper {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
+/* Input Dialog Styles */
+/* Modal fon */
+#tab-input-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none; /* Başda gizlenýär */
+  justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
-#new_tab_input {
-  padding: 6px 10px;
+/* Modal dialog */
+#tab-input-dialog {
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 20px;
+  width: 300px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+/* Başlyk */
+#tab-input-dialog h4 {
+  color: #ffffff;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Input */
+#tab-input-dialog input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
   border: 1px solid #555;
   border-radius: 4px;
-  background-color: #2c2c2c;
+  background-color: #2a2a2a;
   color: #fff;
   outline: none;
 }
 
-#new_tab_input:focus {
-  border-color: #007bff;
+/* Düwmeler */
+.input-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.input-buttons button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+#create_tab_btn {
+  background-color: #28a745;
+  color: white;
+}
+
+#create_tab_btn:hover {
+  background-color: #218838;
+}
+
+#cancel_tab_btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+#cancel_tab_btn:hover {
+  background-color: #5a6268;
+}
+
+
+#cancel_tab_btn:hover {
+    background-color: #5a6268;
 }
 
 #create_tab_btn {
