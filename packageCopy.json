@@ -1,6 +1,6 @@
 {
   "name": "ServerSolution",
-  "version": "1.3.0",
+  "version": "2.3.0",
   "main": "electron/main.js",
   "scripts": {
     "app": "electron --trace-warnings --trace-deprecation  --disable-gpu --enable-logging .  ",
@@ -10,7 +10,8 @@
     "clearENV": "node ./removeEnvUnused.js",
     "backend": "nodemon ./BackendAPI/server.js",
     "build": "electron-builder --publish never",
-    "deploy": "electron builder --publish always"
+    "deploy": "electron builder --publish always",
+    "start": "node Common/copySetup.js && node app.js"
   },
   "author": "Hasabym #developers",
   "license": "ISC",
