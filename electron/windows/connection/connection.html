@@ -11,47 +11,49 @@
 
 <body>
     <main class="main_block">
-        <div class="navbar">
-            <div class="navbar_wrapper">
-                <div class="navbar_title">
-                    <h1>Connection settings</h1>
-                </div>
-                <!-- Tabs shown -->
-                <div class="tabs_wrapper">
-                    <div class="tabs" id="tabs_container">
-                        <button class="tab" id="add_tab">+</button>
+        <header>
+            <div class="navbar">
+                <div class="navbar_wrapper">
+                    <div class="navbar_title">
+                        <h1>Connection settings</h1>
                     </div>
-                </div>
-                <!-- Input for new tab -->
-                <div id="tab-input-overlay">
-                    <div id="tab-input-dialog">
-                        <h4>Täze Tab Döret</h4>
-                        <input type="text" id="new_tab_input" placeholder="Tab adyny giriziň..." />
-                        <div class="input-buttons">
-                            <button id="create_tab_btn">Döret</button>
-                            <button id="cancel_tab_btn">Ýatyr</button>
+                    
+                    <div class="tabs_wrapper">
+                        <div class="tabs" id="tabs_container">
+                            <button class="tab" id="add_tab">+</button>
                         </div>
                     </div>
-                </div>
-                <!-- Context Menu -->
-                <div id="tab_context_menu" class="context-menu" style="display: none;">
-                    <div class="context-option" data-action="duplicate">Duplicate</div>
-                    <div class="context-option" data-action="rename">Rename</div>
-                    <div class="context-option" data-action="delete">Delete</div>
-                </div>
-
-                <div id="rename_modal" class="modal" style="display: none;">
-                    <div class="modal-content">
-                        <h3>Rename Tab</h3>
-                        <input type="text" id="rename_input" />
-                        <div class="modal-buttons">
-                            <button id="rename_cancel_btn">Cancel</button>
-                            <button id="rename_confirm_btn">Rename</button>
+                    
+                    <div id="tab-input-overlay">
+                        <div id="tab-input-dialog">
+                            <h4>Täze Tab Döret</h4>
+                            <input type="text" id="new_tab_input" placeholder="Tab adyny giriziň..." />
+                            <div class="input-buttons">
+                                <button id="create_tab_btn">Döret</button>
+                                <button id="cancel_tab_btn">Ýatyr</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="tab_context_menu" class="context-menu" style="display: none;">
+                        <div class="context-option" data-action="duplicate">Duplicate</div>
+                        <div class="context-option" data-action="rename">Rename</div>
+                        <div class="context-option" data-action="delete">Delete</div>
+                    </div>
+            
+                    <div id="rename_modal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <h3>Rename Tab</h3>
+                            <input type="text" id="rename_input" />
+                            <div class="modal-buttons">
+                                <button id="rename_cancel_btn">Cancel</button>
+                                <button id="rename_confirm_btn">Rename</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </header>
         <div class="main_div_block">
             <div>
                 <div class="backend_settings">
