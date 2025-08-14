@@ -7,10 +7,10 @@ const fs = require('fs')
 const fsPromise = require('fs/promises')
 const sharp = require('sharp')
 const { app } = require('electron')
+const os = require('os')
 
 const { GetConnPool } = require('../Common/mssql.js');
 const { httpSts, prcEnv } = require('../Common/static.js');
-const projectRoot = path.resolve(__dirname, '..');
 
 async function ExecQueryGetRows(query) {
   try {
@@ -288,24 +288,50 @@ function CalculateNewSize(width, height, targetSize) {
 
 
 // For save query
-const queryCache = {};``
+const queryCache = {};
+function getQueriesBasePath() {
+  const possiblePaths = [
+    path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries'),
+    path.join(__dirname, '..', 'Queries'),
+    path.join(process.cwd(), 'Queries')
+  ];
+  console.log('🔍 Searching for Queries folder in:');
+  for (const queryPath of possiblePaths) {
+    console.log(`   Checking: ${queryPath}`);
+    if (fs.existsSync(queryPath)) {
+      console.log(`   ✅ Found: ${queryPath}`);
+      return queryPath;
+    }
+  }
+  console.error('❌ Queries folder not found in any of the expected paths:');
+  possiblePaths.forEach(p => console.error(`   - ${p}`));
+  throw new Error('Queries folder not found in any expected paths');
+}
+
 const LoadQuery = async (fileName, subFolder, params = []) => {
   const cacheKey = `${subFolder}/${fileName}`;
-    if (queryCache[cacheKey]) {
+  if (queryCache[cacheKey]) {
     return processQuery(queryCache[cacheKey], params);
   }
-
   try {
-    const baseQueryDir = path.join('C:', 'ProgramData', 'ServerSolutionDefault', 'Queries');
+    const baseQueryDir = getQueriesBasePath();
     const queryPath = path.join(baseQueryDir, subFolder, `${fileName}.sql`);
+
+    console.log(`🔍 Loading query: ${queryPath}`);
+
+    if (!fs.existsSync(queryPath)) {
+      throw new Error(`Query file does not exist: ${queryPath}`);
+    }
+
     const query = fs.readFileSync(queryPath, 'utf8');
 
     queryCache[cacheKey] = query;
     return processQuery(query, params);
   } catch (err) {
+    console.error(`[LoadQuery] Error loading ${subFolder}/${fileName}.sql:`, err.message);
     throw new Error(`[loadQuery] Failed to read ${subFolder}/${fileName}.sql: ${err.message}`);
   }
-}
+};
 
 // 🧹 Cache-den belli bir faýly aýyrýar
 function InvalidateQueryCache(fileName, subFolder) {
@@ -313,24 +339,25 @@ function InvalidateQueryCache(fileName, subFolder) {
   delete queryCache[cacheKey];
 }
 
-// 🔄 Ähli cache-i arassalaýar (isleseň)
+// 🔄 Ähli cache-i arassalaýar
 function ClearAllQueryCache() {
   Object.keys(queryCache).forEach(key => delete queryCache[key]);
 }
 
-// Parametr bilen query-ni işleýän funksiýa (islegiňize görä düzediň)
+// Parametr bilen query-ni işleýän funksiýa
 const processQuery = (query, params) => {
-    let resultQuery = query;
-    params.forEach((param, index) => {
-        // Parametriň tipini barlaýas
-        const replacement = param === undefined || param === null 
-            ? 'NULL'
-            : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
-            ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
-            : typeof param === 'string' ? `'${param}'` : param; // San bolsa, dykyzsyz goşmaly
-        resultQuery = resultQuery.replace(new RegExp(`\\{${index}\\}`, 'g'), replacement);
-    });
-    return resultQuery;
+  let resultQuery = query;
+  params.forEach((param, index) => {
+    const replacement = param === undefined || param === null
+      ? 'NULL'
+      : typeof param === 'string' && param.includes(',') && resultQuery.includes(`{${index}}`)
+        ? `(${param.split(',').map(p => `'${p.trim()}'`).join(',')})`
+        : typeof param === 'string'
+          ? `'${param}'`
+          : param;
+    resultQuery = resultQuery.replace(new RegExp(`\\{${index}\\}`, 'g'), replacement);
+  });
+  return resultQuery;
 };
 
 /**
@@ -340,9 +367,10 @@ const processQuery = (query, params) => {
  * @returns {Promise<void>}
  */
 const ExecStoredProcedure = async (fileName, subFolder) => {
-    const spQuery = await LoadQuery(fileName, subFolder);
-    return await ExecQueryGetRows(spQuery);
+  const spQuery = await LoadQuery(fileName, subFolder);
+  return await ExecQueryGetRows(spQuery);
 };
+
  
 module.exports = {
   ExecQueryGetRows,

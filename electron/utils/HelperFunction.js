@@ -36,38 +36,7 @@ function ObjectToENV(object) {
   return env
 }
 
-
-async function checkInternet() {
-  const addresses = ['www.google.com', 'www.hasabym.com.tm'];
-  const config = {
-    timeout: 10,
-  };
-  let isAliveCount = 0;
-
-  const probeAsync = (address) => {
-    return new Promise((resolve) => {
-      ping.sys.probe(address, (isAlive) => {
-        resolve(isAlive);
-      }, config);
-    });
-  };
-
-  for (const address of addresses) {
-    const isAlive = await probeAsync(address);
-
-    if (isAlive) {
-      isAliveCount++;
-    }
-  }
-
-  return isAliveCount === addresses.length;
-}
-
-
-
-
 module.exports = {
   isUUID,
-  ObjectToENV,
-  checkInternet
+  ObjectToENV
 };

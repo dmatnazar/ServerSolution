@@ -52,18 +52,3 @@ module.exports = {
     app_exp: servExpress
 }
 
-// try {
-//     const port = prcEnv.backend_port || parseInt(prcEnv.backend_port) + 1
-//     servExpress.set("domain", prcEnv.backend_address || "127.0.0.1");
-//     servExpress.listen(port, function (err) {
-//         if (err) {
-//             console.error('Listening error: ', err)
-//         } else {
-//             console.log(`Success.-y listening port:  ${port}`)
-//             tryInitBackend()
-
-//         }
-//     });
-// } catch (error) {
-//     console.error('Express app main (listen) error: ', error)
-// }

@@ -1,20 +1,31 @@
 const { app, BrowserWindow, ipcMain, nativeImage, Tray, Menu, dialog, net } = require('electron')
 const path = require('path')
 const fs = require('fs')
-require('../Common/copySetup');
+const os = require('os');
 const { ObjectToENV } = require('./utils/HelperFunction')
 const { prcEnv: env, } = require('../Common/static')
 const { TryConnToSql: TryConnToServer, sqlConfig: sqlConn } = require('../Common/mssql')
 const { Main, app_exp } = require('../BackendAPI/server')
 const { SendPing, InvalidateQueryCache} = require('../Common/functions')
-// const { CheckConnectionStatusEvent } = require('../Common/events')
+const { setupSync } =  require('../Common/copySetup');
+
+app.whenReady().then(() => {
+    try {
+        setupSync(); // Setup işlemlerini başlat 
+        console.log('✅ Setup completed successfully');
+    } catch (error) {
+        console.error('❌ Setup failed:', error);
+    }
+});
+
+
 
 const log = require('electron-log')
 const moment = require('moment')
 
 let connectionWin = null, authorizationWin = null, globalContextMenu = null, tray = null;
 let settingsWinTitleForAuth = "Connection Settings "
-const envPath = path.join('C:', 'ProgramData', 'ServerSolutionDefault', '.env');
+const envPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', '.env');
 // const envPath = path.join(process.cwd(), '.env')
 
 log.initialize();
@@ -237,14 +248,24 @@ async function Checkers() {
 
 
 //For save queries
+// Täze esasy Queries ýoly
+const newQueriesPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries');
+// Köne Queries ýoly
+// const oldQueriesPath = 'C:\\ProgramData\\ServerSolutionDefault\\Queries';
+
+// Funksiýa: bar bolan dogry Queries ýoluny tap
+function getQueriesBasePath() {
+    if (fs.existsSync(newQueriesPath)) return newQueriesPath;
+    console.warn('⚠️ Queries folder not found in both new and old paths');
+    return null;
+}
+
+// For save queries list
 ipcMain.handle('get-queries-list', async () => {
-    const queriesPath = path.join('C:\\ProgramData\\ServerSolutionDefault\\Queries');
+    const queriesPath = getQueriesBasePath();
     console.log('🔍 queriesPath:', queriesPath);
 
-    if (!fs.existsSync(queriesPath)) {
-        console.warn('⚠️ Queries folder not found:', queriesPath);
-        return [];
-    }
+    if (!queriesPath) return [];
 
     const folders = fs.readdirSync(queriesPath, { withFileTypes: true });
 
@@ -259,6 +280,7 @@ ipcMain.handle('get-queries-list', async () => {
             };
         });
 });
+
 ipcMain.handle('open-query-editor', async (event, folder, filename) => {
     const queryWindow = new BrowserWindow({
         width: 800,
@@ -267,15 +289,19 @@ ipcMain.handle('open-query-editor', async (event, folder, filename) => {
             preload: path.join(__dirname, 'windows/queryEditor/editorPreload.js'),
             contextIsolation: true,
             nodeIntegration: false,
+            sandbox: false,
         }
     });
 
     await queryWindow.loadFile(path.join(__dirname, 'windows/queryEditor/editor.html'));
 
-    // 🟢 Extension barlanýar we gerek bolsa goşulýar
+    // Dogry Queries ýoly saýla
+    const basePath = getQueriesBasePath();
     const finalFilename = filename.endsWith('.sql') ? filename : `${filename}.sql`;
-    const fullPath = path.join('C:\\ProgramData\\ServerSolutionDefault\\Queries', folder, finalFilename);
+    const fullPath = basePath ? path.join(basePath, folder, finalFilename) : '';
+
     console.log('🔍 Full path to query file:', fullPath);
+
     try {
         const content = fs.readFileSync(fullPath, 'utf-8');
         queryWindow.webContents.send('load-file-content', {
@@ -300,7 +326,7 @@ ipcMain.handle('save-query-file', async (event, filePath, content) => {
         fs.writeFileSync(filePath, content, 'utf-8');
         console.log('File saved:', filePath);
         const folderName = path.basename(path.dirname(filePath));
-        const queryName = path.basename(filePath, '.sql');        
+        const queryName = path.basename(filePath, '.sql');
         InvalidateQueryCache(queryName, folderName);
     } catch (err) {
         console.error('Failed to save file:', err);
@@ -309,51 +335,62 @@ ipcMain.handle('save-query-file', async (event, filePath, content) => {
 });
 
 ipcMain.handle('get-folders', async () => {
-  const baseDir = 'C:\\ProgramData';
-  let folders = [];
+    const baseDir = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections');
+    let folders = [];
 
-  try {
-    const entries = fs.readdirSync(baseDir);
-    for (const entry of entries) {
-      const fullPath = path.join(baseDir, entry);
-      try {
-        const stats = fs.statSync(fullPath);
-        if (stats.isDirectory() && entry.startsWith('ServerSolution')) {
-          folders.push(entry);
+    try {
+        const entries = fs.readdirSync(baseDir);
+        for (const entry of entries) {
+            const fullPath = path.join(baseDir, entry);
+            try {
+                const stats = fs.statSync(fullPath);
+                if (stats.isDirectory() && entry.startsWith('ServerSolution')) {
+                    folders.push(entry);
+                }
+            } catch {
+                continue;
+            }
         }
-      } catch (err) {
-        // Skip files we can't access (like ntuser.pol)
-        continue;
-      }
+    } catch (err) {
+        console.error('Error reading folders:', err);
     }
-  } catch (err) {
-    console.error('Error reading folders:', err);
-  }
 
-  return folders;
+    return folders;
 });
 
 // Rename and delete folders
 ipcMain.handle('rename-folder', async (event, oldName, newName) => {
-  const oldPath = path.join('C:/ProgramData', 'ServerSolution' + oldName);
-  const newPath = path.join('C:/ProgramData', 'ServerSolution' + newName);
-  await fs.promises.rename(oldPath, newPath);
+    const defoultPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections') 
+    const oldPath = path.join(defoultPath , 'ServerSolution' + oldName);
+    const newPath = path.join(defoultPath , 'ServerSolution' + newName);
+    await fs.promises.rename(oldPath, newPath);
 });
 
 ipcMain.handle('delete-folder', async (event, name) => {
-  const folderPath = path.join('C:/ProgramData', 'ServerSolution' + name);
-  await fs.promises.rm(folderPath, { recursive: true, force: true });
+    const defaultPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections');
+    const folderPath = path.join(defaultPath, 'ServerSolution' + name);
+    try {
+        const entries = await fs.promises.readdir(defaultPath, { withFileTypes: true });
+        const onlyDirs = entries.filter(e => e.isDirectory());
+
+        if (onlyDirs.length <= 1) {
+            return { success: false, message: 'Soňky papka pozulmaýar' };
+        }
+        await fs.promises.rm(folderPath, { recursive: true, force: true });
+        return { success: true, message: 'Pozuldy' };
+    } catch (err) {
+        return { success: false, message: err.message };
+    }
 });
 
 // Copy folder
 ipcMain.handle('copy-folder', async (event, newName) => {
-  const baseDir = 'C:\\ProgramData';
-  const source = path.join(baseDir, 'ServerSolutionDefault');
-  const target = path.join(baseDir, `ServerSolution${newName}`);
-  fs.cpSync(source, target, { recursive: true });
-  return `ServerSolution${newName}`;
+    const baseDir = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections');
+    const source = path.join(baseDir, 'ServerSolutionDefault');
+    const target = path.join(baseDir, `ServerSolution${newName}`);
+    fs.cpSync(source, target, { recursive: true });
+    return `ServerSolution${newName}`;
 });
-
 
 ipcMain.on('open_about_window', (event, arg) => {
     BrowserWindow.getFocusedWindow().close()
@@ -383,7 +420,7 @@ ipcMain.on('close_connection_window', () => {
 
 ipcMain.on('save_to_env', async (event, args) => {
     let parsedData = JSON.parse(args);
-    let assigned = Object.assign({}, process.env, parsedData); // Esasy env + täze maglumatlar
+    let assigned = Object.assign({}, process.env, parsedData);
 
     Object.keys(assigned).forEach((item) => {
         process.env[item] = assigned[item];
@@ -397,12 +434,13 @@ ipcMain.on('save_to_env', async (event, args) => {
             return;
         }
         log.info('Successfully saved data to .env');
-        restartApp(); // Restart logikasy sizde öň bar bolsa şol ulanýar
+        restartApp();
         BrowserWindow.getFocusedWindow().close();
     });
 });
 
 const fs1 = require('fs').promises;
+const defaultPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'DefaultQueries');
 ipcMain.handle('read-default-query', async (event, defaultPath) => {
   try {
     console.log('[DEBUG] Input path:', defaultPath);
@@ -421,10 +459,31 @@ ipcMain.handle('read-default-query', async (event, defaultPath) => {
     return null;
   }
 });
+// ipcMain.on('get-version', (event) => {
+//     const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'packageCopy.json'), 'utf8'));
+//     event.returnValue = `${packageJson.name}  v${packageJson.version}`;
+// });
+
+// ipcMain.on('get-version', (event) => {
+//     try {
+//         // Electron öz app.getVersion() method-y bilen wersiýany berýär
+//         // Bu package.json-dan awtomatiki okalýar
+//         const appName = app.getName() || 'Server Solution';
+//         const appVersion = app.getVersion() || '3.3.0';
+
+//         event.returnValue = `${appName}  v${appVersion}`;
+
+//     } catch (err) {
+//         console.error('get-version error:', err);
+//         event.returnValue = 'Server Solution  v3.3.0';
+//     }
+// });
+
+// ÝA-DA gaty ýönekeý usul:
 ipcMain.on('get-version', (event) => {
-    const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'packageCopy.json'), 'utf8'));
-    event.returnValue = `${packageJson.name}  v${packageJson.version}`;
+    event.returnValue = `${app.getName()}  v${app.getVersion()}`;
 });
+
 ipcMain.on('restart_app', () => {
     restartApp()
 })
