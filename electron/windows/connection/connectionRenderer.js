@@ -171,7 +171,7 @@ async function DatabaseTestConn(db_host, db_port, db_name, db_username, db_passw
         if (conn_result.status === 200) {
             db_test_conn_text.style.display = 'block';
             db_test_conn_text.innerText = 'Successfully';
-            db_test_conn_text.style.color = '#90EE90';
+            db_test_conn_text.style.color = '#00802bff';
             db_test_conn_icon.style.display = 'none';
             res = true;
         } else {
@@ -209,21 +209,40 @@ async function loadQueriesList() {
     const result = await window.connectionWindow.getQueriesList();
     const container = document.querySelector('.query_editor');
 
-    result.forEach(folder => {
+    // öňkileri arassala
+    container.innerHTML = "<h1>Query'es</h1>";
+
+    // Rekursiw renderleme
+    function renderFolder(folder, parentDiv) {
         const folderDiv = document.createElement('div');
         folderDiv.innerHTML = `<h3>${folder.folderName}</h3>`;
+        folderDiv.style.marginLeft = "20px";
 
+        // faýllary goş
         folder.files.forEach(file => {
             const fileDiv = document.createElement('div');
             fileDiv.textContent = file;
             fileDiv.style.cursor = 'pointer';
-            fileDiv.onclick = () => openEditor(folder.folderName, file);
+            fileDiv.style.marginLeft = "20px";
+            fileDiv.onclick = () => openEditor(folder.fullPath, file);
             folderDiv.appendChild(fileDiv);
         });
 
-        container.appendChild(folderDiv);
+        // içki papkalary görkez
+        if (folder.subFolders && folder.subFolders.length > 0) {
+            folder.subFolders.forEach(sub => {
+                renderFolder(sub, folderDiv);
+            });
+        }
+
+        parentDiv.appendChild(folderDiv);
+    }
+
+    result.forEach(folder => {
+        renderFolder(folder, container);
     });
 }
+
 
 function openEditor(folderName, fileName) {
     window.connectionWindow.openQueryEditor(folderName, fileName);
