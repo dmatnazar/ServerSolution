@@ -22,15 +22,15 @@ const queriesTargetDefault = path.join(defaultAppDataPath, 'QueriesDefault');
 const queriesTarget = path.join(defaultAppDataPath, 'Queries');
 
 const staticEnvContent = `
-backend_address=192.168.0.10
-backend_port=2002
+backend_address=192.168.5.60
+backend_port=2881
 backend_version=v1
 host=
-db_host=192.168.0.10
+db_host=192.168.5.10
 db_port=1433
-db_name=
+db_name=ActiveDz
 db_username=sa
-db_password=
+db_password=Server123456
 admin_pass=admin1001
 `.trim();
 

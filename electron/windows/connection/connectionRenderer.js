@@ -209,40 +209,84 @@ async function loadQueriesList() {
     const result = await window.connectionWindow.getQueriesList();
     const container = document.querySelector('.query_editor');
 
-    // öňkileri arassala
-    container.innerHTML = "<h1>Query'es</h1>";
+    // Konteýneri arassalamak we header bilen gözleg meýdançasyny goşmak
+    container.innerHTML = `
+        <h1 class="query-editor__title">list of queries</h1>
+        <input type="text" class="query-editor__search" placeholder="Papka ýa-da faýl ady boýunça gözläň...">
+        <div class="query-editor__content"></div>
+    `;
 
-    // Rekursiw renderleme
-    function renderFolder(folder, parentDiv) {
+    const contentContainer = container.querySelector('.query-editor__content');
+    const searchInput = container.querySelector('.query-editor__search');
+
+    // Asyl folderlaryň nusgasyny saklamak
+    const originalFolders = result;
+
+    function renderFolder(folder, parentDiv, depth = 0) {
         const folderDiv = document.createElement('div');
-        folderDiv.innerHTML = `<h3>${folder.folderName}</h3>`;
-        folderDiv.style.marginLeft = "20px";
+        folderDiv.className = `folder folder--depth-${depth}`;
+        folderDiv.innerHTML = `
+            <div class="folder__header">
+                <span class="folder__icon">📁</span>
+                <h5 class="folder__name">${folder.folderName}</h5>
+            </div>
+        `;
 
-        // faýllary goş
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'folder__items';
+
+        // Faýllary render etmek
         folder.files.forEach(file => {
             const fileDiv = document.createElement('div');
-            fileDiv.textContent = file;
-            fileDiv.style.cursor = 'pointer';
-            fileDiv.style.marginLeft = "20px";
+            fileDiv.className = 'file';
+            fileDiv.innerHTML = `
+                <span class="file__icon">📄</span>
+                <span class="file__name">${file}</span>
+            `;
+            fileDiv.title = `${file} aç`;
             fileDiv.onclick = () => openEditor(folder.fullPath, file);
-            folderDiv.appendChild(fileDiv);
+            itemsContainer.appendChild(fileDiv);
         });
 
-        // içki papkalary görkez
-        if (folder.subFolders && folder.subFolders.length > 0) {
-            folder.subFolders.forEach(sub => {
-                renderFolder(sub, folderDiv);
-            });
-        }
-
+        // Subfolderlary render etmek
+        folder.subFolders.forEach(sub => renderFolder(sub, itemsContainer, depth + 1));
+        folderDiv.appendChild(itemsContainer);
         parentDiv.appendChild(folderDiv);
     }
 
-    result.forEach(folder => {
-        renderFolder(folder, container);
-    });
-}
+    // Gözleg funksiýasy
+    function filterAndRender() {
+        const searchTerm = searchInput.value.toLowerCase();
+        contentContainer.innerHTML = ''; // Konteýneri arassalaýarys
 
+        // Filtrlenen folderlary we faýllary render etmek
+        originalFolders.forEach(folder => {
+            const filteredFolder = {
+                folderName: folder.folderName,
+                fullPath: folder.fullPath,
+                files: folder.files.filter(file => file.toLowerCase().includes(searchTerm)),
+                subFolders: folder.subFolders
+                    .map(sub => ({
+                        ...sub,
+                        files: sub.files.filter(file => file.toLowerCase().includes(searchTerm)),
+                        subFolders: sub.subFolders // Rekursiw filtrleme üçin
+                    }))
+                    .filter(sub => sub.files.length > 0 || sub.subFolders.length > 0 || sub.folderName.toLowerCase().includes(searchTerm))
+            };
+
+            // Eger folderde faýl ýa-da subfolder bar bolsa ýa-da folder ady gözlege gabat gelse, render et
+            if (filteredFolder.files.length > 0 || filteredFolder.subFolders.length > 0 || filteredFolder.folderName.toLowerCase().includes(searchTerm)) {
+                renderFolder(filteredFolder, contentContainer);
+            }
+        });
+    }
+
+    // Ilki bilen ähli folderlary render et
+    filterAndRender();
+
+    // Gözleg meýdançasyna event listener goşmak
+    searchInput.addEventListener('input', filterAndRender);
+}
 
 function openEditor(folderName, fileName) {
     window.connectionWindow.openQueryEditor(folderName, fileName);

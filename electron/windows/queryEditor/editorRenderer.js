@@ -121,8 +121,6 @@ function getDefaultQueryPath(filename) {
     'GetSalesByMaterialsQuery.sql': 'Reports\\GetSalesByMaterialsQuery.sql',
 
     // Warehouses
-    'GetCalcOrdAmountQuery.sql': 'Werehouses\\GetCalcOrdAmountQuery.sql',
-    'GetMainQuery.sql': 'Werehouses\\GetMainQuery.sql',
     'GetPersonalStockQuery.sql': 'Werehouses\\GetPersonalStockQuery.sql',
     'MainWhStock.sql': 'Werehouses\\MainWhStock.sql',
     'SpRecalcTotals.sql': 'Werehouses\\SpRecalcTotals.sql',

@@ -286,9 +286,9 @@ function CalculateNewSize(width, height, targetSize) {
   return { width: Math.floor(newWidth), height: Math.floor(newHeight) };
 }
 
-
-// For save query
 const queryCache = {};
+
+// 🔍 Queries kök papkasyny tapýar
 function getQueriesBasePath() {
   const possiblePaths = [
     path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries'),
@@ -308,14 +308,19 @@ function getQueriesBasePath() {
   throw new Error('Queries folder not found in any expected paths');
 }
 
-const LoadQuery = async (fileName, subFolder, params = []) => {
-  const cacheKey = `${subFolder}/${fileName}`;
+// 📥 Query ýükleýän funksiýa
+const LoadQuery = async (category, subFolder, fileName, params = []) => {
+  // mysal: ("generals", "checksums", "GetCheckSumsQuery")
+  const relativePath = path.join(category, subFolder, `${fileName}.sql`);
+  const cacheKey = relativePath;
+
   if (queryCache[cacheKey]) {
     return processQuery(queryCache[cacheKey], params);
   }
+
   try {
     const baseQueryDir = getQueriesBasePath();
-    const queryPath = path.join(baseQueryDir, subFolder, `${fileName}.sql`);
+    const queryPath = path.join(baseQueryDir, relativePath);
 
     console.log(`🔍 Loading query: ${queryPath}`);
 
@@ -328,15 +333,15 @@ const LoadQuery = async (fileName, subFolder, params = []) => {
     queryCache[cacheKey] = query;
     return processQuery(query, params);
   } catch (err) {
-    console.error(`[LoadQuery] Error loading ${subFolder}/${fileName}.sql:`, err.message);
-    throw new Error(`[loadQuery] Failed to read ${subFolder}/${fileName}.sql: ${err.message}`);
+    console.error(`[LoadQuery] Error loading ${relativePath}:`, err.message);
+    throw new Error(`[LoadQuery] Failed to read ${relativePath}: ${err.message}`);
   }
 };
 
 // 🧹 Cache-den belli bir faýly aýyrýar
-function InvalidateQueryCache(fileName, subFolder) {
-  const cacheKey = `${subFolder}/${fileName}`;
-  delete queryCache[cacheKey];
+function InvalidateQueryCache(category, subFolder, fileName) {
+  const relativePath = path.join(category, subFolder, `${fileName}.sql`);
+  delete queryCache[relativePath];
 }
 
 // 🔄 Ähli cache-i arassalaýar
@@ -360,18 +365,8 @@ const processQuery = (query, params) => {
   return resultQuery;
 };
 
-/**
- * Executes a stored procedure from SQL file (without output params).
- * @param {string} fileName 
- * @param {string} subFolder 
- * @returns {Promise<void>}
- */
-const ExecStoredProcedure = async (fileName, subFolder) => {
-  const spQuery = await LoadQuery(fileName, subFolder);
-  return await ExecQueryGetRows(spQuery);
-};
 
- 
+module.exports = { LoadQuery, InvalidateQueryCache, ClearAllQueryCache };
 module.exports = {
   ExecQueryGetRows,
   ExecQueryGetValue,
@@ -390,6 +385,5 @@ module.exports = {
   ImageCompress,
   LoadQuery,
   InvalidateQueryCache,
-  ClearAllQueryCache,
-  ExecStoredProcedure
+  ClearAllQueryCache
 };

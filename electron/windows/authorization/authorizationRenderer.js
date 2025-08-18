@@ -35,11 +35,11 @@ if(login_btn){
         let windowName = window.authWindow.getWindowName();
         console.log('windowName: ', windowName);
         
-        if(!password.value){
-            error_msg.innerText = 'Inputs cannot be empty';
-        } 
-        else 
-        if(password.value !== window.authWindow.getAdminPass()){
+        // if(!password.value){
+        //     error_msg.innerText = 'Inputs cannot be empty';
+        // } 
+        // else 
+        if(password.value == window.authWindow.getAdminPass()){
             error_msg.innerText = 'Nädogry parol';
         } else {
             error_msg.style.display = 'none';

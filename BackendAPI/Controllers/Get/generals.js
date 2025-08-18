@@ -5,14 +5,9 @@ const fs = require('fs').promises; // Asinhron faýl okamak üçin
 const path = require('path');
 const { rows } = require('mssql');
 
-const GetRoutePlansMainQuery = LoadQuery('GetRoutePlansMainQuery', 'Generals');
-const GetRouteDetailsQuery = LoadQuery('GetRouteDetailsQuery', 'Generals');
-const GetRoutePartnersQuery = LoadQuery('GetRoutePartnersQuery', 'Generals');
-
-
 
 const GetOptions = async (req, res) => {
-    const query = await LoadQuery('GetOptionsQuery', 'Generals');
+    const query = await LoadQuery('generals', 'options', 'GetOptionsQuery');
     try {
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
@@ -27,8 +22,8 @@ const GetFirmData = async (req, res) => {
 
         // SQL soragy is hosting-e görä ýükleýäris
         let query = CheckObjForEmpty(params)
-            ? await LoadQuery('GetFirmDataQueryHosting', 'Generals')
-            : await LoadQuery('GetFirmDataQueryDefault', 'Generals');
+            ? await LoadQuery('generals', 'firm_data', 'GetFirmDataQueryHosting')
+            : await LoadQuery('generals', 'firm_data', 'GetFirmDataQueryDefault');
 
         if (!query) {
             return ResSend(res, httpSts.ServerError, 'Query not found', null);
@@ -72,9 +67,8 @@ const GetPartners = async (req, res) => {
     let params = req.query['is_hosting'];
     // Asynchrondyr diýip hasaplaýarys
     const query = CheckObjForEmpty(params)
-      ? await LoadQuery('GetPartnersQueryHosting', 'Generals')
-      : await LoadQuery('GetPartnersQueryDefault', 'Generals');
-
+        ? await LoadQuery('generals', 'partners', 'GetPartnersQueryHosting')
+        : await LoadQuery('generals', 'partners', 'GetPartnersQueryDefault');
     if (!query) {
       return ResSend(res, httpSts.ServerError, 'Query file not found', null);
     }
@@ -90,7 +84,7 @@ const GetPartners = async (req, res) => {
 
 const GetSalesmans = async (req, res) => {
   try {
-    const query = await LoadQuery('GetSalesmansQuery', 'Generals');
+    const query = await LoadQuery('generals', 'salesmans', 'GetSalesmansQuery');
     if (!query) {
       return ResSend(res, httpSts.ServerError, 'Query not found', null);
     }
@@ -103,6 +97,10 @@ const GetSalesmans = async (req, res) => {
 
 const GetRoutePlans = async (req, res) => {
     try {
+        const GetRoutePlansMainQuery =await LoadQuery('generals', 'route_plans', 'GetRoutePlansMainQuery');
+        const GetRouteDetailsQuery = await LoadQuery('generals', 'route_plans', 'GetRouteDetailsQuery');
+        const GetRoutePartnersQuery = await LoadQuery('generals', 'route_plans', 'GetRoutePartnersQuery');
+
         const sqlConnPool = await GetConnPool();
         let request = await sqlConnPool.request();
 
@@ -127,7 +125,7 @@ const GetRoutePlans = async (req, res) => {
 };
 
 const GetUsingTargetPlans = async (req, res) => {
-    const query = await LoadQuery('GetUsingTargetPlansQuery', 'Generals');
+    const query = await LoadQuery('generals', 'using_target', 'GetUsingTargetPlansQuery');
     try {
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
@@ -138,8 +136,7 @@ const GetUsingTargetPlans = async (req, res) => {
 
 const GetRestrictionSettings = async(req, res) =>
 {   
-    const query = await LoadQuery('GetRestrictionSettingsQuery', 'Generals');
-
+    const query = await LoadQuery('generals', 'restr_settings', 'GetRestrictionSettingsQuery');
     try
     {
         let rows = await ExecQueryGetRows(query);
@@ -150,22 +147,6 @@ const GetRestrictionSettings = async(req, res) =>
     }
 }
 
-// const GetContacts = async (req, res) => {
-//     if (CheckObjOrArrForNull(req.query)) {
-//         try {
-
-//             const { operand, guid } = req.query;
-//             const query = await LoadQuery('GetContactsQuery', 'Generals' , [operand], [guid]);
-//             const rows = await ExecQueryGetRows(query);
-//             console.log("GetContacts rows:", rows);
-//             ResSend(res, httpSts.Success, null, rows);
-//         } catch (err) {
-//             ResSend(res, httpSts.ServerError, null, `${err}`);
-//         }
-//     } else {
-//         ResSend(res, httpSts.BadRequest, `Request body is empty! params[operand, guid]`, null);
-//     }
-// };
 
 const GetContacts = async (req, res) => {
     if (CheckObjOrArrForNull(req.query)) {
@@ -173,7 +154,7 @@ const GetContacts = async (req, res) => {
             const { operand, guid } = req.query;
             // operand we guid-i bir params massiwine birleşdirýäs
             const params = [operand, guid];
-            const query = await LoadQuery('GetContactsQuery', 'Generals', params);
+            const query = await LoadQuery('generals', 'contacts', 'GetContactsQuery', params);
             // console.log('SQL Query after replacement:', query); // Çalşylandan soňky soragy barlamak
             const rows = await ExecQueryGetRows(query);
             // console.log("GetContacts rows:", rows);
@@ -189,7 +170,7 @@ const GetContacts = async (req, res) => {
 
 const GetStatuses = async (req, res) =>
 {
-    const query = await LoadQuery('GetStatusesQuery', 'Generals');
+    const query = await LoadQuery('generals', 'statuses', 'GetStatusesQuery');
     try
     {
         let rows = await ExecQueryGetRows(query);
@@ -201,7 +182,7 @@ const GetStatuses = async (req, res) =>
 }
 
 const GetCheckSums = async (req, res) => {
-    const query = await LoadQuery('GetCheckSumsQuery', 'Generals');
+    const query = await LoadQuery('generals', 'checksums', 'GetCheckSumsQuery');
     // console.log("GetCheckSums query:", query);
     try {
         let rows = await ExecQueryGetRows(query);

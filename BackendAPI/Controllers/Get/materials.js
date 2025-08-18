@@ -6,10 +6,9 @@ const { httpSts } =  require('../../../Common/static.js');
 const GetAllMaterials = async (req, res) => {
     try {
         let isHosting = req.query['is_hosting'];
-        let query = CheckObjForEmpty(isHosting) 
-            ? await LoadQuery('GetAllMaterialsHostingQuery' , 'Materials')
-            : await LoadQuery('GetAllMaterialsQuery' , 'Materials');
-
+        let query = CheckObjForEmpty(isHosting)
+            ? await LoadQuery('materials', 'all_materials', 'GetAllMaterialsHostingQuery')
+            : await LoadQuery('materials', 'all_materials', 'GetAllMaterialsQuery');
         let rows = await ExecQueryGetRows(query);
         // console.log("rows", rows);
         // handle discount field only for normal query (not hosting)
@@ -124,7 +123,7 @@ const GetUnitAndDetails = async (req, res) => {
         let request = await sqlConnPool.request();
 
         const unitsQuery = await LoadQuery('UnitsWithGuid', 'Materials');
-        const unitDetailsQuery = await LoadQuery('UnitDetailsWithQuery', 'Materials');
+        const unitDetailsQuery = await LoadQuery('UnitDetailsBasic', 'Materials');
 
 
         let res_units = await request.query(unitsQuery);

@@ -1,6 +1,6 @@
 const str_format = require( '@stdlib/string-format' );
 const { ExecQueryGetRows, ExecQueryGetValue, ResSend, CheckObjForEmpty,
-        CheckObjProps, LoadQuery, ExecStoredProcedure} =  require('../../../Common/functions.js');
+        CheckObjProps, LoadQuery} =  require('../../../Common/functions.js');
 const { httpSts } =  require('../../../Common/static.js');
 
 

@@ -249,36 +249,70 @@ async function Checkers() {
 
 //For save queries
 // Täze esasy Queries ýoly
-const newQueriesPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries');
-// Köne Queries ýoly
-// const oldQueriesPath = 'C:\\ProgramData\\ServerSolutionDefault\\Queries';
+// const newQueriesPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries');
+// // Köne Queries ýoly
+// // const oldQueriesPath = 'C:\\ProgramData\\ServerSolutionDefault\\Queries';
 
-// Funksiýa: bar bolan dogry Queries ýoluny tap
-function getQueriesBasePath() {
-    if (fs.existsSync(newQueriesPath)) return newQueriesPath;
-    console.warn('⚠️ Queries folder not found in both new and old paths');
-    return null;
+// // Funksiýa: bar bolan dogry Queries ýoluny tap
+// function getQueriesBasePath() {
+//     if (fs.existsSync(newQueriesPath)) return newQueriesPath;
+//     console.warn('⚠️ Queries folder not found in both new and old paths');
+//     return null;
+// }
+
+// // For save queries list
+// ipcMain.handle('get-queries-list', async () => {
+//     const queriesPath = getQueriesBasePath();
+//     console.log('🔍 queriesPath:', queriesPath);
+
+//     if (!queriesPath) return [];
+
+//     const folders = fs.readdirSync(queriesPath, { withFileTypes: true });
+
+//     return folders
+//         .filter(dirent => dirent.isDirectory())
+//         .map(dirent => {
+//             const folderPath = path.join(queriesPath, dirent.name);
+//             const files = fs.readdirSync(folderPath).filter(f => f.toLowerCase().endsWith('.sql'));
+//             return {
+//                 folderName: dirent.name,
+//                 files
+//             };
+//         });
+// });
+
+function readFolderRecursive(dirPath) {
+    const result = {
+        folderName: path.basename(dirPath),
+        fullPath: dirPath,
+        files: [],
+        subFolders: []
+    };
+
+    const items = fs.readdirSync(dirPath, { withFileTypes: true });
+
+    items.forEach(item => {
+        const full = path.join(dirPath, item.name);
+        if (item.isDirectory()) {
+            result.subFolders.push(readFolderRecursive(full));
+        } else if (item.isFile() && item.name.endsWith(".sql")) {
+            result.files.push(item.name);
+        }
+    });
+
+    return result;
 }
 
-// For save queries list
-ipcMain.handle('get-queries-list', async () => {
-    const queriesPath = getQueriesBasePath();
-    console.log('🔍 queriesPath:', queriesPath);
+ipcMain.handle("get-queries-list", async () => {
+    const baseDir = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries');
 
-    if (!queriesPath) return [];
+    const items = fs.readdirSync(baseDir, { withFileTypes: true });
 
-    const folders = fs.readdirSync(queriesPath, { withFileTypes: true });
+    const result = items
+        .filter(item => item.isDirectory())
+        .map(item => readFolderRecursive(path.join(baseDir, item.name)));
 
-    return folders
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => {
-            const folderPath = path.join(queriesPath, dirent.name);
-            const files = fs.readdirSync(folderPath).filter(f => f.toLowerCase().endsWith('.sql'));
-            return {
-                folderName: dirent.name,
-                files
-            };
-        });
+    return result;
 });
 
 ipcMain.handle('open-query-editor', async (event, folder, filename) => {
