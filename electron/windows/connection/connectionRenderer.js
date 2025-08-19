@@ -245,6 +245,7 @@ async function loadQueriesList() {
             `;
             fileDiv.title = `${file} aç`;
             fileDiv.onclick = () => openEditor(folder.fullPath, file);
+            // console.log('filePath:', folder.fullPath, 'fileName:', file);
             itemsContainer.appendChild(fileDiv);
         });
 

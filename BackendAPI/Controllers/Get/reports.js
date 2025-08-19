@@ -20,7 +20,7 @@ const GetSalesByMaterials = async (req, res) => {
             //     return ResSend(res, httpSts.BadRequest, 'Invalid seller_id!', null);
             // }
 
-            const query = await LoadQuery('GetSalesByMaterialsQuery', 'Reports', 
+            const query = await LoadQuery('reports', 'sales_b_materials', 'GetSalesByMaterialsQuery', 
                 [startDate, endDate, seller_id]);
             // const query = await ExecQueryGetRows(await LoadQuery("get_sales_by_materials", "Reports", [
             //     ConvertToSQLFormat(data_obj["dt_begin"]),

@@ -14,10 +14,10 @@ const GetWarehouses = async (req, res) => {
 
         // Parametr BAR bolsa we DOLY bolsa (false = NOT empty) — hosting üçin sorag
         if (isHosting !== undefined && isHosting !== null && isHosting !== '') {
-            query = await LoadQuery('WarehousesWithFirm', 'Werehouses');
+            query = await LoadQuery('werehouses', 'warehouse_data', 'WarehousesWithFirm');
         } else {
             // Parametr ýok bolsa ýa-da boş bolsa — adaty ammar sanawy
-            query = await LoadQuery('WarehouseListWithStatus', 'Werehouses');
+            query = await LoadQuery('werehouses', 'warehouse_data', 'WarehouseListWithStatus');
         }
 
         let rows = await ExecQueryGetRows(query);
@@ -53,7 +53,7 @@ const GetStockByWhouse = async (req, res) => {
         const main_whouse_id = await ExecQueryGetValue(mainWhouseIdQuery, 'main_whouse_id');
         // console.log('main_whouse_id:', main_whouse_id);
         // Step 3: Main sklad üçin stock
-        const mainStockQuery = await LoadQuery('MainWhStock', 'Werehouses', [main_whouse_id]);
+        const mainStockQuery = await LoadQuery('werehouses', 'stock_by_whouse', 'MainWhStock', [main_whouse_id]);
         // console.log('mainStockQuery:', mainStockQuery);
         const main_wh_stock = await ExecQueryGetRows(mainStockQuery);
         // console.log('main_wh_stock:', main_wh_stock);
@@ -62,7 +62,7 @@ const GetStockByWhouse = async (req, res) => {
 
         // Step 4: Eger başga sklad soralsa — goşmaça stock çek
         if (CheckObjProps(obj, requiredProps) && obj['whouse_id'] !== main_whouse_id) {
-            const otherStockQuery = await LoadQuery('OtherWhStock', 'Werehouses', [
+            const otherStockQuery = await LoadQuery('werehouses', 'stock_by_whouse', 'OtherWhStock', [
                 obj['seller_id'], obj['whouse_id']
             ]);
             other_wh_stock = await ExecQueryGetRows(otherStockQuery);
@@ -83,7 +83,7 @@ const GetPersonalStock = async (req, res) => {
         let whouse_id = req.query['whouse_id'];
         // console.log('whouse_id:', whouse_id);
         if (CheckObjForEmpty(whouse_id)) {
-            const query = await LoadQuery('GetPersonalStockQuery', 'Werehouses', [whouse_id], );
+            const query = await LoadQuery('werehouses', 'personal_stock', 'GetPersonalStockQuery', [whouse_id], );
             // console.log('SQL Query:', query);
             const rows = await ExecQueryGetRows(query);
             // console.log('ROWS:', rows);

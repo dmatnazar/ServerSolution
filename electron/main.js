@@ -1,12 +1,13 @@
 const { app, BrowserWindow, ipcMain, nativeImage, Tray, Menu, dialog, net } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const fsp = require('fs').promises;
 const os = require('os');
 const { ObjectToENV } = require('./utils/HelperFunction')
 const { prcEnv: env, } = require('../Common/static')
 const { TryConnToSql: TryConnToServer, sqlConfig: sqlConn } = require('../Common/mssql')
 const { Main, app_exp } = require('../BackendAPI/server')
-const { SendPing, InvalidateQueryCache} = require('../Common/functions')
+const { SendPing, InvalidateQueryCache, GetQueriesBasePath } = require('../Common/functions')
 const { setupSync } =  require('../Common/copySetup');
 
 app.whenReady().then(() => {
@@ -25,9 +26,7 @@ const moment = require('moment')
 
 let connectionWin = null, authorizationWin = null, globalContextMenu = null, tray = null;
 let settingsWinTitleForAuth = "Connection Settings "
-const envPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', '.env');
-// const envPath = path.join(process.cwd(), '.env')
-
+const envPath = GetQueriesBasePath('Default', '.env');
 log.initialize();
 const level = process.env.NODE_ENV === 'development' ? 'debug' : 'silly'
 log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
@@ -246,41 +245,7 @@ async function Checkers() {
     BootstrapExpressApp()
 }
 
-
-//For save queries
-// Täze esasy Queries ýoly
-// const newQueriesPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries');
-// // Köne Queries ýoly
-// // const oldQueriesPath = 'C:\\ProgramData\\ServerSolutionDefault\\Queries';
-
 // // Funksiýa: bar bolan dogry Queries ýoluny tap
-// function getQueriesBasePath() {
-//     if (fs.existsSync(newQueriesPath)) return newQueriesPath;
-//     console.warn('⚠️ Queries folder not found in both new and old paths');
-//     return null;
-// }
-
-// // For save queries list
-// ipcMain.handle('get-queries-list', async () => {
-//     const queriesPath = getQueriesBasePath();
-//     console.log('🔍 queriesPath:', queriesPath);
-
-//     if (!queriesPath) return [];
-
-//     const folders = fs.readdirSync(queriesPath, { withFileTypes: true });
-
-//     return folders
-//         .filter(dirent => dirent.isDirectory())
-//         .map(dirent => {
-//             const folderPath = path.join(queriesPath, dirent.name);
-//             const files = fs.readdirSync(folderPath).filter(f => f.toLowerCase().endsWith('.sql'));
-//             return {
-//                 folderName: dirent.name,
-//                 files
-//             };
-//         });
-// });
-
 function readFolderRecursive(dirPath) {
     const result = {
         folderName: path.basename(dirPath),
@@ -304,7 +269,7 @@ function readFolderRecursive(dirPath) {
 }
 
 ipcMain.handle("get-queries-list", async () => {
-    const baseDir = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'Queries');
+    const baseDir = GetQueriesBasePath('Default', 'Queries');
 
     const items = fs.readdirSync(baseDir, { withFileTypes: true });
 
@@ -316,42 +281,52 @@ ipcMain.handle("get-queries-list", async () => {
 });
 
 ipcMain.handle('open-query-editor', async (event, folder, filename) => {
-    const queryWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        webPreferences: {
-            preload: path.join(__dirname, 'windows/queryEditor/editorPreload.js'),
-            contextIsolation: true,
-            nodeIntegration: false,
-            sandbox: false,
-        }
-    });
-
-    await queryWindow.loadFile(path.join(__dirname, 'windows/queryEditor/editor.html'));
-
-    // Dogry Queries ýoly saýla
-    const basePath = getQueriesBasePath();
-    const finalFilename = filename.endsWith('.sql') ? filename : `${filename}.sql`;
-    const fullPath = basePath ? path.join(basePath, folder, finalFilename) : '';
-
-    console.log('🔍 Full path to query file:', fullPath);
-
     try {
-        const content = fs.readFileSync(fullPath, 'utf-8');
+        const queryWindow = new BrowserWindow({
+            width: 800,
+            height: 600,
+            webPreferences: {
+                preload: path.join(__dirname, 'windows/queryEditor/editorPreload.js'),
+                contextIsolation: true,
+                nodeIntegration: false,
+                sandbox: false,
+            },
+        });
+
+        await queryWindow.loadFile(path.join(__dirname, 'windows/queryEditor/editor.html'));
+
+        const basePath = GetQueriesBasePath();
+        if (!basePath) {
+            throw new Error('Queries base path is not defined');
+        }
+
+        // folder üýtgeýjisiniň relatif ýolyny dogry almak
+        const normalizedFolder = path.normalize(folder).replace(basePath, '').replace(/^[\\/]+/, '');
+        const finalFilename = filename.endsWith('.sql') ? filename : `${filename}.sql`;
+        const fullPath = path.join(basePath, normalizedFolder, finalFilename);
+
+        console.log('🔍 Full path to query file:', fullPath);
+
+        if (!fs.existsSync(fullPath)) {
+            throw new Error(`Query file not found: ${fullPath}`);
+        }
+
+        const content = await fsp.readFile(fullPath, 'utf-8');
         queryWindow.webContents.send('load-file-content', {
-            folder,
+            folder: normalizedFolder,
             filename: finalFilename,
             content,
             fullPath,
         });
     } catch (err) {
-        console.error('Error reading query file:', fullPath, err);
+        console.error('Error reading query file:', err.message);
         queryWindow.webContents.send('load-file-content', {
             folder,
-            filename: finalFilename,
+            filename: filename || 'unknown.sql',
             content: `/* Error loading file: ${err.message} */`,
-            fullPath,
+            fullPath: '',
         });
+        dialog.showErrorBox('Error', `Failed to open query file: ${err.message}`);
     }
 });
 
@@ -369,7 +344,7 @@ ipcMain.handle('save-query-file', async (event, filePath, content) => {
 });
 
 ipcMain.handle('get-folders', async () => {
-    const baseDir = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections');
+    const baseDir = GetQueriesBasePath();
     let folders = [];
 
     try {
@@ -394,20 +369,20 @@ ipcMain.handle('get-folders', async () => {
 
 // Rename and delete folders
 ipcMain.handle('rename-folder', async (event, oldName, newName) => {
-    const defoultPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections') 
+    const defoultPath = GetQueriesBasePath() 
     const oldPath = path.join(defoultPath , 'ServerSolution' + oldName);
     const newPath = path.join(defoultPath , 'ServerSolution' + newName);
     await fs.promises.rename(oldPath, newPath);
 });
 
 ipcMain.handle('delete-folder', async (event, name) => {
-    const defaultPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections');
+    const defaultPath = GetQueriesBasePath();
     const folderPath = path.join(defaultPath, 'ServerSolution' + name);
     try {
         const entries = await fs.promises.readdir(defaultPath, { withFileTypes: true });
         const onlyDirs = entries.filter(e => e.isDirectory());
 
-        if (onlyDirs.length <= 1) {
+        if (onlyDirs.length <= 1 && name === 'Default') {
             return { success: false, message: 'Soňky papka pozulmaýar' };
         }
         await fs.promises.rm(folderPath, { recursive: true, force: true });
@@ -419,7 +394,7 @@ ipcMain.handle('delete-folder', async (event, name) => {
 
 // Copy folder
 ipcMain.handle('copy-folder', async (event, newName) => {
-    const baseDir = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections');
+    const baseDir = GetQueriesBasePath();
     const source = path.join(baseDir, 'ServerSolutionDefault');
     const target = path.join(baseDir, `ServerSolution${newName}`);
     fs.cpSync(source, target, { recursive: true });
@@ -474,7 +449,7 @@ ipcMain.on('save_to_env', async (event, args) => {
 });
 
 const fs1 = require('fs').promises;
-const defaultPath = path.join(os.homedir(), 'AppData', 'Local', 'ServerSolution', 'connections', 'ServerSolutionDefault', 'DefaultQueries');
+const defaultPath = GetQueriesBasePath('Default', 'DefaultQueries');
 ipcMain.handle('read-default-query', async (event, defaultPath) => {
   try {
     console.log('[DEBUG] Input path:', defaultPath);
@@ -493,27 +468,7 @@ ipcMain.handle('read-default-query', async (event, defaultPath) => {
     return null;
   }
 });
-// ipcMain.on('get-version', (event) => {
-//     const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'packageCopy.json'), 'utf8'));
-//     event.returnValue = `${packageJson.name}  v${packageJson.version}`;
-// });
 
-// ipcMain.on('get-version', (event) => {
-//     try {
-//         // Electron öz app.getVersion() method-y bilen wersiýany berýär
-//         // Bu package.json-dan awtomatiki okalýar
-//         const appName = app.getName() || 'Server Solution';
-//         const appVersion = app.getVersion() || '3.3.0';
-
-//         event.returnValue = `${appName}  v${appVersion}`;
-
-//     } catch (err) {
-//         console.error('get-version error:', err);
-//         event.returnValue = 'Server Solution  v3.3.0';
-//     }
-// });
-
-// ÝA-DA gaty ýönekeý usul:
 ipcMain.on('get-version', (event) => {
     event.returnValue = `${app.getName()}  v${app.getVersion()}`;
 });
@@ -521,9 +476,6 @@ ipcMain.on('get-version', (event) => {
 ipcMain.on('restart_app', () => {
     restartApp()
 })
-
-
-
 
 function restartApp() {
     const windows = BrowserWindow.getAllWindows();
@@ -540,8 +492,6 @@ function closeApp() {
     process.exit(0)
 }
 
-
-
 async function checkConnections() {
     const { alive } = await SendPing(env.backend_address)
     const sql_conn_res = await TryConnToServer(sqlConn)
@@ -553,14 +503,10 @@ async function checkConnections() {
     }
 }
 
-
-
 app.whenReady().then(async () => {
     log.info('Server Solution is started...')
     createMainWindow()
 })
-
-
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -568,8 +514,6 @@ app.on('window-all-closed', () => {
     }
     log.info('Server Solution is quited.')
 })
-
-
 
 function updateTrayIcon(imagePathOnDisk, trayTooltip) {
     const imagePath = path.join(__dirname, imagePathOnDisk)
@@ -588,7 +532,6 @@ const inactiveText = 'Server Solution | Inactive';
 let connectionStatus = false;
 
 setInterval(checkConnectionStatus, 5000);
-
 
 async function checkConnectionStatus() {
     try {

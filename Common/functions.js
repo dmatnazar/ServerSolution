@@ -295,11 +295,11 @@ function getQueriesBasePath() {
     path.join(__dirname, '..', 'Queries'),
     path.join(process.cwd(), 'Queries')
   ];
-  console.log('🔍 Searching for Queries folder in:');
+  // console.log('🔍 Searching for Queries folder in:');
   for (const queryPath of possiblePaths) {
-    console.log(`   Checking: ${queryPath}`);
+    // console.log(`   Checking: ${queryPath}`);
     if (fs.existsSync(queryPath)) {
-      console.log(`   ✅ Found: ${queryPath}`);
+      // console.log(`   ✅ Found: ${queryPath}`);
       return queryPath;
     }
   }
@@ -310,7 +310,6 @@ function getQueriesBasePath() {
 
 // 📥 Query ýükleýän funksiýa
 const LoadQuery = async (category, subFolder, fileName, params = []) => {
-  // mysal: ("generals", "checksums", "GetCheckSumsQuery")
   const relativePath = path.join(category, subFolder, `${fileName}.sql`);
   const cacheKey = relativePath;
 
@@ -322,7 +321,7 @@ const LoadQuery = async (category, subFolder, fileName, params = []) => {
     const baseQueryDir = getQueriesBasePath();
     const queryPath = path.join(baseQueryDir, relativePath);
 
-    console.log(`🔍 Loading query: ${queryPath}`);
+    console.log(`🤝⚙️🔗 Loading query: ${fileName}`);
 
     if (!fs.existsSync(queryPath)) {
       throw new Error(`Query file does not exist: ${queryPath}`);
@@ -365,8 +364,28 @@ const processQuery = (query, params) => {
   return resultQuery;
 };
 
+function GetQueriesBasePath(tabFolderName, inTabFolder) {
+  let queriesPath = path.join(
+    os.homedir(),
+    'AppData', 'Local', 'ServerSolution', 'connections'
+  );
+  if (tabFolderName) {
+    queriesPath = path.join(queriesPath, `ServerSolution${String(tabFolderName)}`);
+  }
+  if (inTabFolder) {
+    queriesPath = path.join(queriesPath, inTabFolder);
+  }
+  try {
+    if (!fs.existsSync(queriesPath)) {
+      console.log('✅ Queries folder not found');
+    }
+    return queriesPath;
+  } catch (err) {
+    console.error('⚠️ Error accessing or creating Queries folder:', err.message);
+    return null;
+  }
+}
 
-module.exports = { LoadQuery, InvalidateQueryCache, ClearAllQueryCache };
 module.exports = {
   ExecQueryGetRows,
   ExecQueryGetValue,
@@ -385,5 +404,6 @@ module.exports = {
   ImageCompress,
   LoadQuery,
   InvalidateQueryCache,
-  ClearAllQueryCache
+  ClearAllQueryCache,
+  GetQueriesBasePath
 };

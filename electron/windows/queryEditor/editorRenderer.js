@@ -1,4 +1,3 @@
-// REQUIRE-lary aýyrdyk, sebäbi browser kontekstinde işlemeýär
 let editor;
 let filePath = '';
 let originalFilename = '';
@@ -9,7 +8,7 @@ window.queryEditor.onLoad(({ filename, content, fullPath }) => {
   originalFilename = filename;
 
   if (editor) {
-    editor.toTextArea(); // Эгер мурдагы редактор болсо, тазалап кой
+    editor.toTextArea(); // Ýokarydakylaryň öňki redaktoryny arassalamak
   }
 
   editor = CodeMirror.fromTextArea(document.getElementById('code-area'), {
@@ -27,7 +26,13 @@ window.queryEditor.onLoad(({ filename, content, fullPath }) => {
 
 document.getElementById('save-btn').addEventListener('click', () => {
   const newContent = editor.getValue();
-  window.queryEditor.saveFile(filePath, newContent);
+  window.queryEditor.saveFile(filePath, newContent)
+    .then(() => {
+      alert('Faýl üstünlikli ýatda saklandy!');
+    })
+    .catch((error) => {
+      alert('Ýalňyşlyk: Faýl ýatda saklanmady. Sebäp: ' + error.message);
+    });
 });
 
 document.getElementById('restore-btn').addEventListener('click', () => {
@@ -80,56 +85,55 @@ async function restoreDefaultQuery() {
 
 function getDefaultQueryPath(filename) {
   const homeDir = window.nodeUtils.homeDir();
-  const defaultBasePath = `${homeDir}\\AppData\\Local\\ServerSolution\\connections\\ServerSolutionDefault\\QueriesDefault`;
+  const defaultBasePath = getQueriesBasePath('Default', 'QueriesDefault');
 
   const mapping = {
     // Generals
-    'GetCheckSumsQuery.sql': 'Generals\\GetCheckSumsQuery.sql',
-    'GetContactsQuery.sql': 'Generals\\GetContactsQuery.sql',
-    'GetFirmDataQueryDefault.sql': 'Generals\\GetFirmDataQueryDefault.sql',
-    'GetFirmDataQueryHosting.sql': 'Generals\\GetFirmDataQueryHosting.sql',
-    'GetOptionsQuery.sql': 'Generals\\GetOptionsQuery.sql',
-    'GetPartnersQueryDefault.sql': 'Generals\\GetPartnersQueryDefault.sql',
-    'GetPartnersQueryHosting.sql': 'Generals\\GetPartnersQueryHosting.sql',
-    'GetRestrictionSettingsQuery.sql': 'Generals\\GetRestrictionSettingsQuery.sql',
-    'GetRouteDetailsQuery.sql': 'Generals\\GetRouteDetailsQuery.sql',
-    'GetRoutePartnersQuery.sql': 'Generals\\GetRoutePartnersQuery.sql',
-    'GetRoutePlansMainQuery.sql': 'Generals\\GetRoutePlansMainQuery.sql',
-    'GetSalesmansQuery.sql': 'Generals\\GetSalesmansQuery.sql',
-    'GetStatusesQuery.sql': 'Generals\\GetStatusesQuery.sql',
-    'GetUsingTargetPlansQuery.sql': 'Generals\\GetUsingTargetPlansQuery.sql',
+    'GetCheckSumsQuery.sql': 'generals\\checksums\\GetCheckSumsQuery.sql',
+    'GetContactsQuery.sql': 'generals\\contacts\\GetContactsQuery.sql',
+    'GetFirmDataQueryDefault.sql': 'generals\\firm_data\\GetFirmDataQueryDefault.sql',
+    'GetFirmDataQueryHosting.sql': 'generals\\firm_data\\GetFirmDataQueryHosting.sql',
+    'GetOptionsQuery.sql': 'generals\\options\\GetOptionsQuery.sql',
+    'GetPartnersQueryDefault.sql': 'generals\\partners\\GetPartnersQueryDefault.sql',
+    'GetPartnersQueryHosting.sql': 'generals\\partners\\GetPartnersQueryHosting.sql',
+    'GetRestrictionSettingsQuery.sql': 'generals\\restr_settings\\GetRestrictionSettingsQuery.sql',
+    'GetRouteDetailsQuery.sql': 'generals\\route_plans\\GetRouteDetailsQuery.sql',
+    'GetRoutePartnersQuery.sql': 'generals\\route_plans\\GetRoutePartnersQuery.sql',
+    'GetRoutePlansMainQuery.sql': 'generals\\route_plans\\GetRoutePlansMainQuery.sql',
+    'GetSalesmansQuery.sql': 'generals\\salesmans\\GetSalesmansQuery.sql',
+    'GetStatusesQuery.sql': 'generals\\statuses\\GetStatusesQuery.sql',
+    'GetUsingTargetPlansQuery.sql': 'generals\\using_target\\GetUsingTargetPlansQuery.sql',
 
     // Materials
-    'GetAllMaterialsHostingQuery.sql': 'Materials\\GetAllMaterialsHostingQuery.sql',
-    'GetAllMaterialsQuery.sql': 'Materials\\GetAllMaterialsQuery.sql',
-    'GetAttributesQuery.sql': 'Materials\\GetAttributesQuery.sql',
-    'GetBarcodesQuery.sql': 'Materials\\GetBarcodesQuery.sql',
-    'GetCurrencyQuery.sql': 'Materials\\GetCurrencyQuery.sql',
-    'GetGroupsQuery.sql': 'Materials\\GetGroupsQuery.sql',
-    'GetLastPricesQuery.sql': 'Materials\\GetLastPricesQuery.sql',
-    'GetMaterialImageQuery.sql': 'Materials\\GetMaterialImageQuery.sql',
-    'GetMaterialPricesQuery.sql': 'Materials\\GetMaterialPricesQuery.sql',
-    'GetMaterialsImgIDQuery.sql': 'Materials\\GetMaterialsImgIDQuery.sql',
-    'GetMtrlAttrUnitQuery.sql': 'Materials\\GetMtrlAttrUnitQuery.sql',
-    'GetPrTypesQuery.sql': 'Materials\\GetPrTypesQuery.sql',
-    'UnitDetailsBasic.sql': 'Materials\\UnitDetailsBasic.sql',
-    'UnitDetailsWithQuery.sql': 'Materials\\UnitDetailsWithQuery.sql',
-    'UnitsList.sql': 'Materials\\UnitsList.sql',
-    'UnitsWithGuid.sql': 'Materials\\UnitsWithGuid.sql',
+    'GetAllMaterialsHostingQuery.sql': 'materials\\all_materials\\GetAllMaterialsHostingQuery.sql',
+    'GetAllMaterialsQuery.sql': 'materials\\all_materials\\GetAllMaterialsQuery.sql',
+    'GetAttributesQuery.sql': 'materials\\attributes\\GetAttributesQuery.sql',
+    'GetBarcodesQuery.sql': 'materials\\barcodes\\GetBarcodesQuery.sql',
+    'GetCurrencyQuery.sql': 'materials\\currency_and_pr_types\\GetCurrencyQuery.sql',
+    'GetPrTypesQuery.sql': 'materials\\currency_and_pr_types\\GetPrTypesQuery.sql',
+    'GetGroupsQuery.sql': 'materials\\groups\\GetGroupsQuery.sql',
+    'GetLastPricesQuery.sql': 'materials\\last_prices\\GetLastPricesQuery.sql',
+    'GetMaterialImageQuery.sql': 'materials\\material_image\\GetMaterialImageQuery.sql',
+    'GetMaterialPricesQuery.sql': 'materials\\material_prices\\GetMaterialPricesQuery.sql',
+    'GetMaterialsImgIDQuery.sql': 'materials\\mat_img_id\\GetMaterialsImgIDQuery.sql',
+    'GetMtrlAttrUnitQuery.sql': 'materials\\mtrl_attr_unit\\GetMtrlAttrUnitQuery.sql',
+    'UnitDetailsBasic.sql': 'materials\\unit_and_details\\UnitDetailsBasic.sql',
+    'UnitDetailsWithQuery.sql': 'materials\\material_units\\UnitDetailsWithQuery.sql',
+    'UnitsList.sql': 'materials\\material_units\\UnitsList.sql',
+    'UnitsWithGuid.sql': 'materials\\unit_and_details\\UnitsWithGuid.sql',
 
     // Reports
-    'GetSalesByMaterialsQuery.sql': 'Reports\\GetSalesByMaterialsQuery.sql',
+    'GetSalesByMaterialsQuery.sql': 'reports\\sales_b_materials\\GetSalesByMaterialsQuery.sql',
 
     // Warehouses
-    'GetPersonalStockQuery.sql': 'Werehouses\\GetPersonalStockQuery.sql',
-    'MainWhStock.sql': 'Werehouses\\MainWhStock.sql',
-    'SpRecalcTotals.sql': 'Werehouses\\SpRecalcTotals.sql',
-    'WarehousesWithFirm.sql': 'Werehouses\\WarehousesWithFirm.sql',
-    'warehouseListWithStatus.sql': 'Werehouses\\WarehouseListWithStatus.sql'
+    'GetPersonalStockQuery.sql': 'werehouses\\personal_stock\\GetPersonalStockQuery.sql',
+    'MainWhStock.sql': 'werehouses\\stock_by_whouse\\MainWhStock.sql',
+    'OtherWhStock.sql': 'werehouses\\stock_by_whouse\\OtherWhStock.sql',
+    'WarehouseListWithStatus.sql': 'werehouses\\warehouse_data\\WarehouseListWithStatus.sql',
+    'WarehousesWithFirm.sql': 'werehouses\\warehouse_data\\WarehousesWithFirm.sql'
   };
 
   if (mapping[filename]) {
-    // Manual path joining for Windows
     return `${defaultBasePath}\\${mapping[filename]}`;
   }
   return null;
@@ -140,3 +144,18 @@ document.getElementById('confirmation-overlay').addEventListener('click', (e) =>
     hideConfirmationDialog();
   }
 });
+
+function getQueriesBasePath(tabFolderName, inTabFolder) {
+  let queriesPath = window.nodeUtils.homeDir();
+  queriesPath = queriesPath + '\\AppData\\Local\\ServerSolution\\connections';
+
+  if (tabFolderName) {
+    queriesPath = queriesPath + `\\ServerSolution${String(tabFolderName)}`;
+  }
+
+  if (inTabFolder) {
+    queriesPath = queriesPath + `\\${inTabFolder}`;
+  }
+
+  return queriesPath;
+}

@@ -30,7 +30,7 @@ const GetMaterialPrices = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetMaterialPricesQuery', 'Materials');
+        const query = await LoadQuery('materials', 'material_prices', 'GetMaterialPricesQuery');
         const rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -44,8 +44,8 @@ const GetMaterialUnits = async (req, res) => {
         const sqlConnPool = await GetConnPool();
         const request = sqlConnPool.request();
 
-        const unitsQuery = await LoadQuery('UnitsList', 'Materials');
-        const unitDetailsQuery = await LoadQuery('UnitDetailsBasic', 'Materials');
+        const unitsQuery = await LoadQuery('materials', 'material_units', 'UnitsList');
+        const unitDetailsQuery = await LoadQuery('materials', 'material_units', 'UnitDetailsWithQuery');
 
         const unitResult = await request.query(unitsQuery);
         const unitDetResult = await request.query(unitDetailsQuery);
@@ -54,6 +54,8 @@ const GetMaterialUnits = async (req, res) => {
             tbl_units: unitResult.recordset,
             tbl_unit_details: unitDetResult.recordset
         };
+
+        // console.log('GetMaterialUnits response:', obj);
 
         ResSend(res, httpSts.Success, null, obj);
     } catch (err) {
@@ -67,7 +69,7 @@ const GetMaterialsImgID = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetMaterialsImgIDQuery', 'Materials');
+        const query = await LoadQuery('materials', 'mat_img_id', 'GetMaterialsImgIDQuery');
         // console.log('Material_id -----------' , query)
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
@@ -83,7 +85,7 @@ const GetMaterialImage = async (req, res) => {
         let image_id = req.query['image_id'];
         // console.log('image_id-------', image_id)
         if (CheckObjForEmpty(image_id)) {
-            const query = await LoadQuery('GetMaterialImageQuery', 'Materials', [image_id]);
+            const query = await LoadQuery('materials', 'material_image', 'GetMaterialImageQuery', [image_id]);
             // console.log('query------------' , query)
             const sqlConnPool = await GetConnPool();
             let result = await sqlConnPool.request().query(query);
@@ -122,8 +124,8 @@ const GetUnitAndDetails = async (req, res) => {
         const sqlConnPool = await GetConnPool();
         let request = await sqlConnPool.request();
 
-        const unitsQuery = await LoadQuery('UnitsWithGuid', 'Materials');
-        const unitDetailsQuery = await LoadQuery('UnitDetailsBasic', 'Materials');
+        const unitsQuery = await LoadQuery('materials', 'unit_and_details', 'UnitsWithGuid');
+        const unitDetailsQuery = await LoadQuery('materials', 'unit_and_details', 'UnitDetailsBasic');
 
 
         let res_units = await request.query(unitsQuery);
@@ -148,7 +150,7 @@ const GetGroups = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetGroupsQuery', 'Materials');
+        const query = await LoadQuery('materials', 'material_units', 'GetGroupsQuery');
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -162,7 +164,7 @@ const GetAttributes = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetAttributesQuery', 'Materials');
+        const query = await LoadQuery('materials', 'attributes', 'GetAttributesQuery');
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -175,7 +177,7 @@ const GetMtrlAttrUnit = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetMtrlAttrUnitQuery', 'Materials');
+        const query = await LoadQuery('materials', 'mtrl_attr_unit', 'GetMtrlAttrUnitQuery');
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -190,8 +192,8 @@ const GetCurrencyAndPrTypes = async (req, res) => {
         let request = await sqlConnPool.request();
 
         // Load queries asynchronously
-        const currencyQuery = await LoadQuery('GetCurrencyQuery', 'Materials');
-        const prTypesQuery = await LoadQuery('GetPrTypesQuery', 'Materials');
+        const currencyQuery = await LoadQuery('materials', 'currensy_and_pr_types', 'GetCurrencyQuery');
+        const prTypesQuery = await LoadQuery('materials', 'currensy_and_pr_types', 'GetPrTypesQuery');
 
         // Execute both queries
         let res_currency = await request.query(currencyQuery);
@@ -218,7 +220,7 @@ const GetLastPrices = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetLastPricesQuery', 'Materials');
+        const query = await LoadQuery('materials', 'last_prices', 'GetLastPricesQuery');
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 
@@ -232,7 +234,7 @@ const GetBarcodes = async(req, res) =>
 {
     try
     {
-        const query = await LoadQuery('GetBarcodesQuery', 'Materials');
+        const query = await LoadQuery('mayterials', 'barcodes', 'GetBarcodesQuery');
         let rows = await ExecQueryGetRows(query);
         ResSend(res, httpSts.Success, null, rows);
 

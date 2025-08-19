@@ -44,7 +44,6 @@ if(login_btn){
         } else {
             error_msg.style.display = 'none';
             success_msg.innerText = 'Successfully';
-            // window.authWindow.authSuccessfully()
             if(windowName === 'createAboutWindow'){
                 window.authWindow.openAboutWindow()
             }  else if (windowName === 'createConnectionWindow'){
