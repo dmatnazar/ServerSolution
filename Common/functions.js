@@ -308,7 +308,7 @@ function getQueriesBasePath() {
   throw new Error('Queries folder not found in any expected paths');
 }
 
-// 📥 Query ýükleýän funksiýa
+// 📥  funksQuery ýükleýäniýa
 const LoadQuery = async (category, subFolder, fileName, params = []) => {
   const relativePath = path.join(category, subFolder, `${fileName}.sql`);
   const cacheKey = relativePath;
@@ -337,11 +337,8 @@ const LoadQuery = async (category, subFolder, fileName, params = []) => {
   }
 };
 
-// 🧹 Cache-den belli bir faýly aýyrýar
-function InvalidateQueryCache(category, subFolder, fileName) {
-  const relativePath = path.join(category, subFolder, `${fileName}.sql`);
-  delete queryCache[relativePath];
-}
+
+
 
 // 🔄 Ähli cache-i arassalaýar
 function ClearAllQueryCache() {

@@ -1,3 +1,7 @@
+const { InvalidateQueryCache } = require('../../../Common/functions');
+// const { SendPing, InvalidateQueryCache, GetQueriesBasePath } = require('../Common/functions')
+
+
 let editor;
 let filePath = '';
 let originalFilename = '';
@@ -29,6 +33,9 @@ document.getElementById('save-btn').addEventListener('click', () => {
   window.queryEditor.saveFile(filePath, newContent)
     .then(() => {
       alert('Faýl üstünlikli ýatda saklandy!');
+      window.queryEditor.onFileSaved(filePath, newContent);
+      console.log('File saved successfully:', filePath);
+      InvalidateQueryCache(filePath, newContent);
     })
     .catch((error) => {
       alert('Ýalňyşlyk: Faýl ýatda saklanmady. Sebäp: ' + error.message);
@@ -84,7 +91,6 @@ async function restoreDefaultQuery() {
 }
 
 function getDefaultQueryPath(filename) {
-  const homeDir = window.nodeUtils.homeDir();
   const defaultBasePath = getQueriesBasePath('Default', 'QueriesDefault');
 
   const mapping = {
