@@ -1,18 +1,14 @@
-const { InvalidateQueryCache } = require('../../../Common/functions');
-// const { SendPing, InvalidateQueryCache, GetQueriesBasePath } = require('../Common/functions')
-
-
 let editor;
 let filePath = '';
 let originalFilename = '';
 
 window.queryEditor.onLoad(({ filename, content, fullPath }) => {
-  document.getElementById('file-title').innerText = filename;
+  document.getElementById('file-title').innerText = fullPath;
   filePath = fullPath;
   originalFilename = filename;
 
   if (editor) {
-    editor.toTextArea(); // Ýokarydakylaryň öňki redaktoryny arassalamak
+    editor.toTextArea();
   }
 
   editor = CodeMirror.fromTextArea(document.getElementById('code-area'), {
@@ -28,17 +24,50 @@ window.queryEditor.onLoad(({ filename, content, fullPath }) => {
   editor.setValue(content);
 });
 
+document.getElementById('file-title').addEventListener('click', () => {
+  if (!filePath) return;
+
+  // Electron: OS-de default programma bilen açmak
+  window.nodeUtils.openFile(filePath);
+
+  // Ýa-da, öz funksiýaňy çagyrmak:
+  // window.queryEditor.openFileInNewTab(filePath);
+});
+
+function showNotify(title, message, type = 'info') {
+  const container = document.getElementById('toast-container');
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <div>
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+  `;
+
+  toast.addEventListener('click', () => removeToast(toast));
+  container.appendChild(toast);
+
+  setTimeout(() => removeToast(toast), 3000);
+}
+
+function removeToast(toast) {
+  toast.style.animation = 'toast-out 0.25s ease forwards';
+  toast.addEventListener('animationend', () => toast.remove());
+}
+
+
 document.getElementById('save-btn').addEventListener('click', () => {
   const newContent = editor.getValue();
   window.queryEditor.saveFile(filePath, newContent)
     .then(() => {
-      alert('Faýl üstünlikli ýatda saklandy!');
-      window.queryEditor.onFileSaved(filePath, newContent);
+      showNotify('Üstünlik', 'Faýl üstünlikli ýatda saklandy!', 'success');
+      window.queryEditor.onFileSaved?.(filePath, newContent);
       console.log('File saved successfully:', filePath);
-      InvalidateQueryCache(filePath, newContent);
     })
     .catch((error) => {
-      alert('Ýalňyşlyk: Faýl ýatda saklanmady. Sebäp: ' + error.message);
+      showNotify('Ýalňyşlyk', 'Faýl ýatda saklanmady: ' + error.message, 'error');
     });
 });
 
@@ -68,7 +97,7 @@ async function restoreDefaultQuery() {
     const defaultQueryPath = getDefaultQueryPath(originalFilename);
 
     if (!defaultQueryPath) {
-      alert('Bu faýl üçin default query tapylmady!');
+      showNotify('Duýduryş', 'Bu faýl üçin default query tapylmady!', 'warning');
       console.error('Could not map filename to default query path');
       return;
     }
@@ -76,20 +105,20 @@ async function restoreDefaultQuery() {
     const defaultContent = await window.queryEditor.readDefaultQuery(defaultQueryPath);
 
     if (!defaultContent) {
-      alert('Default query faýly tapylmady!');
+      showNotify('Duýduryş', 'Default query faýly tapylmady!', 'warning');
       console.error('Could not read default query file');
       return;
     }
 
     editor.setValue(defaultContent);
     await window.queryEditor.saveFile(filePath, defaultContent);
+    showNotify('Üstünlik', 'Default query dikeldildi!', 'success');
     console.log('Default query restored successfully');
   } catch (error) {
     console.error('Error restoring default query:', error);
-    alert('An error occurred while restoring the default query!');
+    showNotify('Ýalňyşlyk', 'Default query dikeldilmedi: ' + error.message, 'error');
   }
 }
-
 function getDefaultQueryPath(filename) {
   const defaultBasePath = getQueriesBasePath('Default', 'QueriesDefault');
 

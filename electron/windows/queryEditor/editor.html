@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Query Editor</title>
   <link rel="stylesheet" href="queryEditor.css">
   <!-- CodeMirror CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/material-darker.min.css">
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;">
+  <link rel="stylesheet" href="scripts/css/codemirror.min.css">
+  <link rel="stylesheet" href="scripts/css/material-darker.min.css">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
 </head>
+
 <body>
-  <h2 id="file-title"></h2>
-  
+  <div id="file-title" title="query file path"></div>
+
   <!-- Täze navbar goşuldy -->
   <div id="navbar">
     <button id="save-btn">💾 Save</button>
@@ -21,6 +23,9 @@
   <div id="editor-container">
     <textarea id="code-area"></textarea>
   </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
 
   <!-- Confirmation Dialog goşuldy -->
   <div id="confirmation-overlay">
@@ -35,8 +40,9 @@
   </div>
 
   <!-- CodeMirror Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/sql/sql.min.js"></script>
+  <script src="scripts/codemirror.min.js"></script>
+  <script src="scripts/sql.min.js"></script>
   <script src="editorRenderer.js" defer></script>
 </body>
+
 </html>

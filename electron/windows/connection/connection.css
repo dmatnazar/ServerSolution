@@ -382,7 +382,6 @@ button:disabled {
 }
 
 #refresh_icon_wrapper {
-  animation: spin .5s linear infinite;
   display: flex;
 }
 

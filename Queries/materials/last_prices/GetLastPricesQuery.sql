@@ -26,7 +26,7 @@ WITH vtbl_temp AS (
 	lower( m.material_id_guid ) AS mtrl_guid,
 	lower( d.unit_det_id_guid ) AS unit_det_guid,
 	cast(
-	p.price_value AS DECIMAL ( 18, 2 )) AS price_value,
+	p.price_value AS DECIMAL ( 18, 3 )) AS price_value,
 	p.price_code,
 	p.modify_date AS price_date_time 
 FROM

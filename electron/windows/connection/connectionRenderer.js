@@ -171,7 +171,7 @@ async function DatabaseTestConn(db_host, db_port, db_name, db_username, db_passw
         if (conn_result.status === 200) {
             db_test_conn_text.style.display = 'block';
             db_test_conn_text.innerText = 'Successfully';
-            db_test_conn_text.style.color = '#00802bff';
+            db_test_conn_text.style.color = 'rgb(255, 255, 255)';
             db_test_conn_icon.style.display = 'none';
             res = true;
         } else {

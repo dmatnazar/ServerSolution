@@ -338,6 +338,14 @@ const LoadQuery = async (category, subFolder, fileName, params = []) => {
 };
 
 
+// 🗑️ Query-i cache-den aýyrmak
+function InvalidateQueryCache(category, subFolder, fileName, folderName = 'Default') {
+  const relativePath = path.join(category, subFolder, `${fileName}.sql`);
+  const cacheKey = `${folderName}_${relativePath}`;
+  delete queryCache[cacheKey];
+  console.log(`🗑️ Cache invalidated for folder "${folderName}": ${relativePath}`);
+}
+
 
 
 // 🔄 Ähli cache-i arassalaýar
@@ -400,7 +408,7 @@ module.exports = {
   ImageUploader,
   ImageCompress,
   LoadQuery,
-  InvalidateQueryCache,
   ClearAllQueryCache,
-  GetQueriesBasePath
+  GetQueriesBasePath,
+  InvalidateQueryCache
 };

@@ -280,6 +280,10 @@ ipcMain.handle("get-queries-list", async () => {
     return result;
 });
 
+ipcMain.handle("notify", async (event, data) => {
+    return data
+})
+
 ipcMain.handle('open-query-editor', async (event, folder, filename) => {
     try {
         const queryWindow = new BrowserWindow({
@@ -335,8 +339,9 @@ ipcMain.handle('save-query-file', async (event, filePath, content) => {
         fs.writeFileSync(filePath, content, 'utf-8');
         console.log('File saved:', filePath);
         const folderName = path.basename(path.dirname(filePath));
+        const subFolderName = path.basename(path.dirname(path.dirname(filePath)));
         const queryName = path.basename(filePath, '.sql');
-        InvalidateQueryCache(queryName, folderName);
+        InvalidateQueryCache(folderName, subFolderName, queryName,);
     } catch (err) {
         console.error('Failed to save file:', err);
         throw err;
