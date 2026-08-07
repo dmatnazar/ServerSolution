@@ -391,6 +391,27 @@ function GetQueriesBasePath(tabFolderName, inTabFolder) {
   }
 }
 
+/**
+ * CLIENT-SIDE TARIHINI UTC'YE DÖNÜŞTÜR
+ * Client (telefon) tarafından gelen DateTime değerlerini UTC'ye dönüştürür
+ * 
+ * @param {Date|string} clientDate - Client'ten gelen tarih
+ * @param {number} tzOffsetHours - Timezone offset saati (default: 5 = UTC+5 Baku)
+ * @returns {Date|null} - UTC zamanı
+ */
+function ConvertClientDateToUTC(clientDate, tzOffsetHours = 5) {
+  if (!clientDate) return null;
+  try {
+    const date = new Date(clientDate);
+    if (isNaN(date.getTime())) return null;
+    // Client timezone'ını çıkartarak UTC'ye dönüştür
+    return new Date(date.getTime() + (tzOffsetHours * 60 * 60 * 1000));
+  } catch (e) {
+    console.error('[ConvertClientDateToUTC] Date conversion error:', e);
+    return null;
+  }
+}
+
 module.exports = {
   ExecQueryGetRows,
   ExecQueryGetValue,
@@ -410,5 +431,6 @@ module.exports = {
   LoadQuery,
   ClearAllQueryCache,
   GetQueriesBasePath,
-  InvalidateQueryCache
+  InvalidateQueryCache,
+  ConvertClientDateToUTC
 };

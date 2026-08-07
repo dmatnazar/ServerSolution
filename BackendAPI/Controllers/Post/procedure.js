@@ -2,7 +2,7 @@ const fs = require('fs')
 const sql = require('mssql');
 
 const { ResSend, CheckObjProps, CheckResObjKey, CheckObjOrArrForNull,
-    DoMatchingInDB, ImageCompress } = require('../../../Common/functions.js');
+    DoMatchingInDB, ImageCompress, ConvertClientDateToUTC } = require('../../../Common/functions.js');
 const { GetConnPool, sqlConfig } = require('../../../Common/mssql.js');
 const { httpSts } = require('../../../Common/static.js');
 const path = require('path');
@@ -26,7 +26,7 @@ const AddGpsData = async (req, res) => {
                     let result = await sqlConnPool.request()
                         .input('gps_file_id', sql.VarChar, data_row['gps_file_id'])
                         .input('device_code', sql.Char, params['device_code'])
-                        .input('create_dt', sql.DateTime, data_row['create_dt'])
+                        .input('create_dt', sql.DateTime, ConvertClientDateToUTC(data_row['create_dt']))
                         .input('latitude', sql.Float, data_row['latitude'])
                         .input('longitude', sql.Float, data_row['longitude'])
                         .input('altitude', sql.Float, data_row['altitude'])
@@ -307,7 +307,7 @@ const AddPhotoReport = async (req, res) => {
                 .input('file_size', sql.Float, pr.size)
                 .input('file_blob', sql.Image, imageBuffer)
                 .input('file_path', sql.VarChar, file_path)
-                .input('file_datetime', sql.DateTime, params.datetime)
+                .input('file_datetime', sql.DateTime, ConvertClientDateToUTC(params.datetime))
                 .input('file_extention', sql.VarChar, pr.mimetype)
                 .input('partner_id', sql.Int, data_obj['partner_id'])
                 .input('salesman_id', sql.Int, data_obj['seller_id'])

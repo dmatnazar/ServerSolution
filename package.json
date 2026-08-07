@@ -1,6 +1,6 @@
 {
   "name": "ServerSolution",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "main": "electron/main.js",
   "scripts": {
     "app": "electron --trace-warnings --trace-deprecation  --disable-gpu --enable-logging .  ",

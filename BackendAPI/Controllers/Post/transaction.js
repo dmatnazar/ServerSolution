@@ -1,6 +1,6 @@
 const sql = require('mssql');
 
-const { ResSend, CheckResObjKey, ExecQueryGetValue, DoMatchingInDB  } =  require('../../../Common/functions.js');
+const { ResSend, CheckResObjKey, ExecQueryGetValue, DoMatchingInDB, ConvertClientDateToUTC  } =  require('../../../Common/functions.js');
 const { sqlConfig } =  require('../../../Common/mssql.js');
 const { httpSts } =  require('../../../Common/static.js');
 
@@ -76,7 +76,7 @@ const AddOrder = async (req, res) =>
             let request = new sql.Request(transaction)
                 .input('fich_id', sql.Int, order_id)
                 .input('fich_code', sql.NVarChar, order_head['ord_code'])
-                .input('fich_date', sql.DateTime, order_head['ord_datetime'])
+                .input('fich_date', sql.DateTime, ConvertClientDateToUTC(order_head['ord_datetime']))
                 .input('fich_total', sql.Float, order_head['ord_subtotal'])
                 .input('fich_type_id', sql.Int, order_head['ord_type_id'])
                 .input('arap_id', sql.Int, parent_data['partner_id'])
@@ -250,7 +250,7 @@ const AddInvoice = async (req, res) => {
         let request = new sql.Request(transaction)
             .input('fich_id', sql.Int, 0)
             .input('fich_code', sql.NVarChar, dlvnote_head['dlvnote_code'])
-            .input('fich_date', sql.DateTime, dlvnote_head['dlvnote_datetime'])
+            .input('fich_date', sql.DateTime, ConvertClientDateToUTC(dlvnote_head['dlvnote_datetime']))
             .input('fich_total', sql.Float, dlvnote_head['dlvnote_subtotal'])
             .input('fich_type_id', sql.Int, dlvnote_head['dlvnote_type_id'])
             .input('arap_id', sql.Int, dlvnote_head['partner_id'])
@@ -289,7 +289,7 @@ const AddInvoice = async (req, res) => {
         request = new sql.Request(transaction)
             .input('inv_id', sql.Int, 0)
             .input('inv_code', sql.NVarChar, invoice_head['inv_code'])
-            .input('inv_date', sql.DateTime, invoice_head['inv_datetime'])
+            .input('inv_date', sql.DateTime, ConvertClientDateToUTC(invoice_head['inv_datetime']))
             .input('inv_total', sql.Float, invoice_head['inv_subtotal'])
             .input('inv_type_id', sql.Int, inv_type_id)
             .input('arap_id', sql.Int, parent_data['partner_id'])
@@ -537,7 +537,7 @@ const AddMatInvoice = async (req, res) =>
         let request = new sql.Request(transaction)
             .input('mat_inv_head_id', sql.Int, 0)
             .input('mat_inv_code', sql.NVarChar, mat_inv_head['mat_inv_code'])
-            .input('mat_inv_date', sql.DateTime, mat_inv_head['mat_inv_datetime'])
+            .input('mat_inv_date', sql.DateTime, ConvertClientDateToUTC(mat_inv_head['mat_inv_datetime']))
             .input('mat_inv_docno', sql.NVarChar, empty)
             .input('out_div_id', sql.Int, mat_inv_head['out_div_id'])
             .input('out_dept_id', sql.Int, mat_inv_head['out_dept_id'])
@@ -589,7 +589,7 @@ const AddMatInvoice = async (req, res) =>
                     .input('out_wh_id', sql.Int, mat_inv_line['out_whouse_id'])
                     .input('in_wh_id', sql.Int, mat_inv_line['in_whouse_id'])
                     .input('mat_inv_head_id', sql.Int, mat_invoice_id)
-                    .input('fich_line_expiredate', sql.DateTime, mat_inv_line['mat_inv_line_crt_date'])
+                    .input('fich_line_expiredate', sql.DateTime, ConvertClientDateToUTC(mat_inv_line['mat_inv_line_crt_date']))
                     .input('fich_line_serialno', sql.NVarChar, empty)
                     .output('mat_inv_line_iden', sql.Int)
 
@@ -787,7 +787,7 @@ const AddInvPayments = async (req, res) => {
                         .input('ks_card_id', sql.Int, inv_payment['cash_id'])
                         .input('p_id', sql.Int, 1)
                         .input('ks_card_tr_type_id', sql.Int, ks_card_tr_type_id)
-                        .input('ks_line_date', sql.DateTime, inv_payment['pay_datetime'])
+                        .input('ks_line_date', sql.DateTime, ConvertClientDateToUTC(inv_payment['pay_datetime']))
                         .input('div_id', sql.Int, invoice_head['div_id'])
                         .input('dept_id', sql.Int, invoice_head['dept_id'])
                         .input('arap_id', sql.Int, inv_payment['partner_id'])
